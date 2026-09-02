@@ -1,55 +1,190 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ID Card Generator</title>
+  <title>Insight Metrics ID Card Generator</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { background: #f0f2f5; padding: 20px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-    
-    .form-container { background: #fff; padding: 20px; border-radius: 8px; width: 320px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .form-container h2 { font-size: 16px; margin-bottom: 12px; color: #333; border-bottom: 2px solid #00a651; padding-bottom: 4px; }
-    .input-group { margin-bottom: 10px; }
-    .input-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 3px; color: #555; }
-    .input-group input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
-    .btn-download { width: 100%; padding: 10px; background: #00a651; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #e0e4e8; padding: 20px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 
-    .preview-container { display: flex; flex-direction: column; gap: 15px; }
-    
+    /* Control Panel */
+    .form-container { background: #fff; padding: 20px; border-radius: 12px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .form-container h2 { font-size: 16px; margin-bottom: 15px; color: #111; border-bottom: 2px solid #0b7942; padding-bottom: 5px; }
+    .input-group { margin-bottom: 10px; }
+    .input-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #444; }
+    .input-group input { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+    .btn-download { width: 100%; padding: 10px; background: #0b7942; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+    /* Cards Wrapper */
+    .preview-container { display: flex; flex-direction: column; gap: 20px; }
+
+    /* CARD CONTAINER */
     .id-card {
       width: 250px;
-      height: 380px;
-      background: #fff;
-      border: 1px solid #00a651;
-      border-radius: 10px;
-      padding: 12px;
+      height: 420px;
+      background: #ffffff;
+      border-radius: 0px;
       position: relative;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background-size: cover;
     }
 
-    .card-header { display: flex; justify-content: space-between; align-items: center; }
-    .company-logo { font-size: 16px; font-weight: bold; color: #00a651; }
-    .company-title { text-align: center; font-size: 11px; font-weight: bold; color: #222; margin-top: 4px; }
-    .card-type { text-align: center; font-size: 9px; letter-spacing: 1px; color: #666; margin-bottom: 6px; }
-
-    .photo-frame { width: 90px; height: 100px; border: 2px solid #00a651; border-radius: 8px; margin: 0 auto; overflow: hidden; background: #eef2f5; display: flex; align-items: center; justify-content: center; }
-    .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
-
-    .user-name { text-align: center; font-size: 12px; font-weight: bold; color: #111; margin-top: 6px; text-transform: uppercase; }
+    /* FRONT SIDE DESIGN */
+    .front-header {
+      background: #0b7942;
+      padding: 15px 10px 12px 10px;
+      text-align: center;
+      position: relative;
+    }
+    .header-logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      margin-bottom: 6px;
+    }
+    .logo-im-box { font-size: 22px; font-weight: 900; color: #00d369; line-height: 1; }
+    .logo-im-gray { font-size: 22px; font-weight: 900; color: #999; line-height: 1; }
+    .header-title { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 0.2px; }
+    .header-title span { color: #aaa; font-weight: 700; }
     
-    .info-list { font-size: 10px; margin-top: 8px; color: #222; line-height: 1.5; }
-    .info-row { display: flex; justify-content: space-between; }
+    .badge-pill {
+      background: #ffffff;
+      color: #0b7942;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 14px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
 
-    .back-company-name { font-size: 11px; font-weight: bold; color: #333; text-align: center; }
-    .office-title { font-size: 8px; font-weight: bold; color: #666; text-align: center; margin-top: 2px; }
-    .address-box { font-size: 7.5px; text-align: center; color: #444; line-height: 1.3; margin-top: 4px; }
-    .validity-box { font-size: 8px; font-weight: bold; text-align: center; background: #f0f0f0; padding: 4px; border-radius: 4px; margin-top: 10px; }
-    .signature-area { text-align: center; margin-top: 15px; font-size: 8px; font-weight: bold; border-top: 1px solid #aaa; padding-top: 2px; }
+    /* Photo Frame */
+    .photo-container {
+      width: 105px;
+      height: 115px;
+      border: 4px solid #00c865;
+      border-radius: 12px;
+      margin: 12px auto 0 auto;
+      overflow: hidden;
+      background: #f5f5f5;
+    }
+    .photo-container img { width: 100%; height: 100%; object-fit: cover; }
+
+    .user-name {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #0b7942;
+      margin-top: 8px;
+    }
+
+    /* Info Section with Left Border Line */
+    .info-section {
+      margin: 12px 15px 20px 18px;
+      position: relative;
+      padding-left: 10px;
+    }
+    .info-section::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #0b7942;
+    }
+    .info-row { display: flex; font-size: 9.5px; font-weight: 800; color: #222; margin-bottom: 3px; }
+    .info-label { width: 80px; color: #333; }
+    .info-val { color: #222; }
+
+    /* Bottom Stripe Front */
+    .bottom-bar { height: 6px; background: #0b7942; width: 100%; }
+
+    /* BACK SIDE DESIGN */
+    .back-header {
+      background: #0b7942;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 6px;
+      border: 1px dashed rgba(255,255,255,0.6);
+      text-align: center;
+    }
+    .back-header .header-title { font-size: 13px; }
+
+    .office-location-title {
+      text-align: center;
+      font-size: 9px;
+      font-weight: 800;
+      color: #0b7942;
+      margin-top: 2px;
+    }
+
+    .address-card {
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 6px;
+      margin: 4px 15px 0 15px;
+      text-align: center;
+      font-size: 7.5px;
+      color: #444;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .client-title {
+      text-align: center;
+      font-size: 8px;
+      font-weight: 800;
+      color: #0b7942;
+      margin-top: 8px;
+    }
+
+    .client-logos {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 15px;
+      margin-top: 6px;
+    }
+    .client-logos span { font-size: 8px; font-weight: bold; color: #0288d1; }
+    .badge-jti-green { color: #0b7942 !important; font-size: 11px !important; font-style: italic; }
+    .akg-circle { background: #e30613; border: 1.5px solid #ffed00; border-radius: 50%; width: 22px; height: 22px; color: #fff; font-size: 6px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+    .smc-box { border: 1px solid #3f51b5; padding: 1px 3px; font-size: 7px !important; color: #3f51b5 !important; }
+
+    /* Watermark Back */
+    .back-watermark-container {
+      text-align: center;
+      margin-top: 6px;
+    }
+    .big-im-logo {
+      display: inline-flex;
+      align-items: flex-end;
+    }
+    .big-im-logo .i-part { width: 18px; height: 50px; background: #00c865; margin-right: 3px; border-radius: 2px; }
+    .big-im-logo .m-part { font-size: 60px; font-weight: 900; color: #999; line-height: 0.7; }
+
+    .validity-row {
+      text-align: center;
+      font-size: 8px;
+      font-weight: 800;
+      color: #222;
+      margin-top: 10px;
+    }
+
+    .signature-area {
+      text-align: right;
+      padding-right: 15px;
+      margin-top: -5px;
+      margin-bottom: 10px;
+    }
+    .sig-img { height: 25px; margin-bottom: -2px; }
+    .sig-text { font-size: 8px; font-weight: 800; color: #222; border-top: 1px solid #333; display: inline-block; padding-top: 1px; }
 
     @media print {
       body * { visibility: hidden; }
@@ -60,26 +195,27 @@
 </head>
 <body>
 
+  <!-- Input Form -->
   <div class="form-container">
-    <h2>ID Card Details</h2>
+    <h2>ID Details Edit</h2>
     <div class="input-group">
       <label>Full Name</label>
-      <input type="text" id="inName" value="MD SHUVO BISWAS" oninput="updateCard()">
+      <input type="text" id="inName" value="Md Tamim" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>ID No.</label>
-      <input type="text" id="inId" value="4523" oninput="updateCard()">
+      <input type="text" id="inId" value="5160" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>Mobile</label>
-      <input type="text" id="inMobile" value="01791996607" oninput="updateCard()">
+      <input type="text" id="inMobile" value="01608-038005" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>Blood Group</label>
-      <input type="text" id="inBlood" value="B+" oninput="updateCard()">
+      <input type="text" id="inBlood" value="O+" oninput="updateCard()">
     </div>
     <div class="input-group">
-      <label>Photo</label>
+      <label>Profile Picture</label>
       <input type="file" id="inPhoto" accept="image/*" onchange="loadPhoto(event)">
     </div>
     <div class="input-group">
@@ -90,62 +226,93 @@
       <label>Expire Date</label>
       <input type="text" id="inExpire" value="12-31-2028" oninput="updateCard()">
     </div>
-    <button class="btn-download" onclick="window.print()">Print / Save as PDF</button>
+    <button class="btn-download" onclick="window.print()">Print / Save PDF</button>
   </div>
 
+  <!-- Cards Preview -->
   <div class="preview-container">
-    <!-- FRONT -->
+    
+    <!-- FRONT SIDE -->
     <div class="id-card">
       <div>
-        <div class="card-header">
-          <div class="company-logo">im</div>
-        </div>
-        <div class="company-title">Insight Metrics Limited</div>
-        <div class="card-type">IDENTITY CARD</div>
-        
-        <div class="photo-frame">
-          <img id="cardPhoto" src="" alt="Photo">
+        <div class="front-header">
+          <div class="header-logo-container">
+            <span class="logo-im-box">im</span>
+          </div>
+          <div class="header-title">Insight <span>Metrics Limited</span></div>
+          <div class="badge-pill">IDENTITY CARD</div>
         </div>
 
-        <div class="user-name" id="cardName">MD SHUVO BISWAS</div>
-        
-        <div class="info-list">
-          <div class="info-row"><span>ID NO.</span><span id="cardId">: 4523</span></div>
-          <div class="info-row"><span>MOBILE</span><span id="cardMobile">: 01791996607</span></div>
-          <div class="info-row"><span>BLOOD GROUP</span><span id="cardBlood">: B+</span></div>
+        <div class="photo-container">
+          <img id="cardPhoto" src="https://via.placeholder.com/105x115" alt="User Photo">
+        </div>
+
+        <div class="user-name" id="cardName">Md Tamim</div>
+
+        <div class="info-section">
+          <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="cardId">:5160</span></div>
+          <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="cardMobile">: 01608-038005</span></div>
+          <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="cardBlood">:O+</span></div>
         </div>
       </div>
+
+      <div class="bottom-bar"></div>
     </div>
 
-    <!-- BACK -->
+    <!-- BACK SIDE -->
     <div class="id-card">
       <div>
-        <div class="back-company-name">Insight Metrics Limited</div>
-        <div class="office-title">OFFICE LOCATION</div>
-        <div class="address-box">
+        <div class="back-header">
+          <div class="header-title">Insight <span>Metrics Limited</span></div>
+        </div>
+
+        <div class="office-location-title">OFFICE LOCATION</div>
+        <div class="address-card">
           House #10, Suite #203, Level #1, Road #8<br>
           Gulshan #1, Dhaka 1212, Bangladesh<br>
-          Call: 01311930805 | www.insightmetricsbd.com
+          <b>Call:</b> 01311930805 |<br>
+          www.insightmetricsbd.com
+        </div>
+
+        <div class="client-title">ASSOCIATED CLIENT COMPANIES</div>
+        <div class="client-logos">
+          <span>grameenphone</span>
+          <span class="badge-jti-green">JTi</span>
+          <div class="akg-circle">AKG</div>
+          <span class="smc-box">SMC</span>
+        </div>
+
+        <div class="back-watermark-container">
+          <div class="big-im-logo">
+            <div class="i-part"></div>
+            <div class="m-part">m</div>
+          </div>
         </div>
       </div>
 
       <div>
-        <div class="validity-box">
-          Issue: <span id="cardIssue">01-02-2024</span> | Expire: <span id="cardExpire">12-31-2028</span>
+        <div class="validity-row">
+          Issue Date: <span id="cardIssue">01-02-2024</span> | Expire Date: <span id="cardExpire">12-31-2028</span>
         </div>
+
         <div class="signature-area">
-          Issuing Authority
+          <svg class="sig-img" viewBox="0 0 100 30" width="80">
+            <path d="M 10 20 Q 30 5 50 20 T 90 10" fill="none" stroke="#111" stroke-width="2"/>
+          </svg><br>
+          <div class="sig-text">Issuing Authority</div>
         </div>
+        <div class="bottom-bar"></div>
       </div>
     </div>
+
   </div>
 
   <script>
     function updateCard() {
       document.getElementById('cardName').innerText = document.getElementById('inName').value;
-      document.getElementById('cardId').innerText = ": " + document.getElementById('inId').value;
+      document.getElementById('cardId').innerText = ":" + document.getElementById('inId').value;
       document.getElementById('cardMobile').innerText = ": " + document.getElementById('inMobile').value;
-      document.getElementById('cardBlood').innerText = ": " + document.getElementById('inBlood').value;
+      document.getElementById('cardBlood').innerText = ":" + document.getElementById('inBlood').value;
       document.getElementById('cardIssue').innerText = document.getElementById('inIssue').value;
       document.getElementById('cardExpire').innerText = document.getElementById('inExpire').value;
     }
