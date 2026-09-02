@@ -1,54 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Insight Metrics ID Card Generator - Ultra Premium</title>
+  <title>Bulk Premium ID Card Generator - Insight Metrics</title>
   <!-- html2pdf.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    body { background: #dce2e8; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+    body { background: #cfd8dc; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
     /* FORM SIDEBAR */
     .form-container {
       background: #ffffff;
       padding: 20px;
       border-radius: 12px;
-      width: 340px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      width: 350px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       max-height: 90vh;
       overflow-y: auto;
     }
-    .form-container h2 { font-size: 16px; margin-bottom: 15px; color: #111; border-bottom: 2px solid #00a651; padding-bottom: 5px; }
+    .form-container h2 { font-size: 16px; margin-bottom: 15px; color: #00796b; border-bottom: 2px solid #00a651; padding-bottom: 5px; }
     
     .select-card-qty {
-      background: #f0fdf4;
+      background: #e8f5e9;
       border: 1.5px solid #00a651;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       margin-bottom: 15px;
     }
-    .select-card-qty label { font-size: 12px; font-weight: bold; color: #00a651; display: block; margin-bottom: 5px; }
-    .select-card-qty select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; }
+    .select-card-qty label { font-size: 13px; font-weight: bold; color: #00695c; display: block; margin-bottom: 6px; }
+    .select-card-qty select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #b2dfdb; font-weight: bold; outline: none; }
 
     .member-block {
-      background: #fafafa;
-      border: 1px solid #ddd;
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
       border-radius: 8px;
       padding: 12px;
       margin-bottom: 12px;
     }
-    .member-block h3 { font-size: 13px; color: #00a651; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px; }
+    .member-block h3 { font-size: 13px; color: #008d44; margin-bottom: 8px; border-bottom: 1px dashed #cccccc; padding-bottom: 4px; }
     
     .input-group { margin-bottom: 8px; }
-    .input-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #444; }
-    .input-group input { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+    .input-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #444; }
+    .input-group input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
 
     .btn-download {
       width: 100%;
       padding: 12px;
-      background: #00a651;
+      background: linear-gradient(135deg, #00a651 0%, #00695c 100%);
       color: white;
       border: none;
       border-radius: 6px;
@@ -56,25 +56,26 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 10px;
-      box-shadow: 0 4px 10px rgba(0,166,81,0.3);
+      box-shadow: 0 4px 12px rgba(0,166,81,0.3);
+      transition: all 0.2s ease;
     }
-    .btn-download:hover { background: #008d44; }
+    .btn-download:hover { opacity: 0.95; transform: translateY(-1px); }
 
-    /* PREVIEW CONTAINER */
+    /* PREVIEW AREA */
     .preview-container {
-      background: #555;
+      background: #424242;
       padding: 15px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    /* A4 PAGE FIX FOR 2 SETS PER PAGE */
+    /* EXACT A4 PAGE SETUP (2 SETS PER PAGE FOR PERFECT PDF FIT) */
     .pdf-page {
       width: 210mm;
       height: 290mm;
       background: #ffffff !important;
-      padding: 12mm 10mm;
+      padding: 10mm;
       display: flex;
       flex-direction: column;
       gap: 12mm;
@@ -88,11 +89,11 @@
       display: flex;
       justify-content: center;
       gap: 12mm;
-      height: 120mm;
+      height: 122mm;
       align-items: center;
     }
 
-    /* UNIQUE ID CARD LAYOUT */
+    /* UNIQUE & MODERN ID CARD STYLING */
     .id-card {
       width: 66mm;
       height: 112mm;
@@ -104,17 +105,16 @@
       flex-direction: column;
       justify-content: space-between;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
 
-    /* FRONT HEADER WITH UNIQUE ACCENT */
+    /* FRONT HEADER WITH GRADIENT COLOR */
     .front-header {
-      background: linear-gradient(135deg, #00a651 0%, #008d44 100%) !important;
+      background: linear-gradient(135deg, #00a651 0%, #00796b 100%) !important;
       padding: 10px 8px 6px 8px;
       text-align: center;
-      position: relative;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -147,7 +147,7 @@
     .header-im-logo .m-text {
       font-size: 26px;
       font-weight: 900;
-      color: #ffffff;
+      color: #e0f2f1;
       line-height: 0.72;
     }
 
@@ -161,10 +161,10 @@
 
     .pill-badge {
       background: #ffffff !important;
-      color: #00a651;
+      color: #00796b;
       font-size: 7.5px;
       font-weight: 900;
-      padding: 2px 10px;
+      padding: 2.5px 12px;
       border-radius: 10px;
       display: inline-block;
       margin-top: 4px;
@@ -172,8 +172,8 @@
     }
 
     .photo-container {
-      width: 88px;
-      height: 98px;
+      width: 90px;
+      height: 100px;
       border: 3px solid #00a651;
       border-radius: 12px;
       margin: 6px auto 0 auto;
@@ -185,15 +185,15 @@
 
     .user-name {
       text-align: center;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 900;
-      color: #00a651;
+      color: #00796b;
       margin-top: 5px;
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
 
-    /* LARGE & PROMINENT INFO SECTION */
+    /* LARGE BOLD INFORMATION TEXT */
     .info-section {
       margin: 6px 10px 8px 12px;
       position: relative;
@@ -209,15 +209,15 @@
       background: #00a651 !important;
       border-radius: 2px;
     }
-    .info-row { display: flex; font-size: 9px; font-weight: 900; color: #000; margin-bottom: 4px; }
-    .info-label { width: 68px; color: #111; font-weight: 900; }
-    .info-val { color: #000; font-weight: 900; font-size: 9.5px; }
+    .info-row { display: flex; font-size: 9.5px; font-weight: 900; color: #000; margin-bottom: 4px; }
+    .info-label { width: 70px; color: #111; font-weight: 900; }
+    .info-val { color: #000; font-weight: 900; font-size: 10px; }
 
     .bottom-bar { height: 5px; background: #00a651 !important; width: 100%; }
 
     /* BACK SIDE STYLING */
     .back-header {
-      background: linear-gradient(135deg, #00a651 0%, #008d44 100%) !important;
+      background: linear-gradient(135deg, #00a651 0%, #00796b 100%) !important;
       padding: 6px 8px;
       margin: 6px 8px 4px 8px;
       border-radius: 4px;
@@ -307,7 +307,7 @@
     .back-im-logo .m-text {
       font-size: 68px;
       font-weight: 900;
-      color: #bebebe;
+      color: #cfd8dc;
       line-height: 0.72;
     }
 
@@ -340,7 +340,7 @@
       <label for="cardCount">কয়টি ID কার্ড লাগবে?</label>
       <select id="cardCount" onchange="renderForms()">
         <option value="1">1 Person</option>
-        <option value="2" selected>2 Persons (1 Page)</option>
+        <option value="2">2 Persons (1 Page)</option>
         <option value="3">3 Persons</option>
         <option value="4">4 Persons (2 Pages)</option>
         <option value="5">5 Persons</option>
@@ -348,13 +348,13 @@
         <option value="7">7 Persons</option>
         <option value="8">8 Persons (4 Pages)</option>
         <option value="9">9 Persons</option>
-        <option value="10">10 Persons (5 Pages)</option>
+        <option value="10" selected>10 Persons (5 Pages)</option>
       </select>
     </div>
 
     <div id="formsWrapper"></div>
 
-    <button class="btn-download" onclick="downloadAllPDF()">Download PDF (2 Cards/Page)</button>
+    <button class="btn-download" onclick="downloadAllPDF()">Download All Cards (PDF)</button>
   </div>
 
   <!-- PDF AREA -->
@@ -380,19 +380,19 @@
             <h3>Card #${i} Information</h3>
             <div class="input-group">
               <label>Full Name</label>
-              <input type="text" id="name_${i}" value="MD SHUVO BISWAS" oninput="updateCards()">
+              <input type="text" id="name_${i}" value="Md Tamim" oninput="updateCards()">
             </div>
             <div class="input-group">
               <label>ID No.</label>
-              <input type="text" id="id_${i}" value="${4520 + i}" oninput="updateCards()">
+              <input type="text" id="id_${i}" value="${5160 + i - 1}" oninput="updateCards()">
             </div>
             <div class="input-group">
               <label>Mobile</label>
-              <input type="text" id="mobile_${i}" value="01791996607" oninput="updateCards()">
+              <input type="text" id="mobile_${i}" value="01608-038005" oninput="updateCards()">
             </div>
             <div class="input-group">
               <label>Blood Group</label>
-              <input type="text" id="blood_${i}" value="B+" oninput="updateCards()">
+              <input type="text" id="blood_${i}" value="O+" oninput="updateCards()">
             </div>
             <div class="input-group">
               <label>Profile Photo</label>
@@ -408,7 +408,7 @@
           pdfArea.appendChild(pageDiv);
         }
 
-        // Render Unique ID Cards
+        // Render ID Cards
         const pairHTML = `
           <div class="card-pair-wrapper">
             <!-- FRONT SIDE -->
@@ -432,12 +432,12 @@
                   <img id="photo_preview_${i}" src="https://via.placeholder.com/105x115?text=Photo" alt="User Photo">
                 </div>
 
-                <div class="user-name" id="view_name_${i}">MD SHUVO BISWAS</div>
+                <div class="user-name" id="view_name_${i}">Md Tamim</div>
 
                 <div class="info-section">
-                  <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="view_id_${i}">:${4520 + i}</span></div>
-                  <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="view_mobile_${i}">: 01791996607</span></div>
-                  <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="view_blood_${i}">:B+</span></div>
+                  <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="view_id_${i}">:${5160 + i - 1}</span></div>
+                  <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="view_mobile_${i}">: 01608-038005</span></div>
+                  <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="view_blood_${i}">:O+</span></div>
                 </div>
               </div>
               <div class="bottom-bar"></div>
@@ -524,7 +524,7 @@
       const element = document.getElementById('pdfArea');
       const opt = {
         margin:       0,
-        filename:     'Insight_Metrics_ID_Cards.pdf',
+        filename:     'Insight_Metrics_10_ID_Cards.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, logging: false },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
