@@ -3,10 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Insight Metrics ID Card - Perfect Replica</title>
+  <title>Insight Metrics ID Card - Perfect Print</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-    body { background: #dcdfe3; padding: 20px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    
+    /* Ensure background colors print properly */
+    @media print {
+      body { background: transparent !important; padding: 0 !important; }
+      .form-container { display: none !important; }
+      .preview-container { margin: 0 !important; gap: 10px !important; }
+      .id-card { 
+        box-shadow: none !important; 
+        page-break-inside: avoid;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+
+    body { 
+      background: #e0e4e8; 
+      padding: 20px; 
+      display: flex; 
+      gap: 20px; 
+      justify-content: center; 
+      flex-wrap: wrap; 
+    }
 
     /* Control Panel Form */
     .form-container { background: #fff; padding: 20px; border-radius: 12px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: fit-content; }
@@ -18,7 +40,7 @@
 
     .preview-container { display: flex; flex-direction: column; gap: 20px; }
 
-    /* CARD CONTAINER */
+    /* CARD STRUCTURE */
     .id-card {
       width: 250px;
       height: 420px;
@@ -29,16 +51,21 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
     }
 
-    /* FRONT HEADER DESIGN */
+    /* FRONT HEADER */
     .front-header {
-      background: #00a651;
+      background: #00a651 !important;
       padding: 14px 10px 8px 10px;
       text-align: center;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
 
-    /* 'im' Logo on Green Background (White 'i' + Gray 'm') */
+    /* Header Logo */
     .header-im-logo {
       display: inline-flex;
       align-items: flex-end;
@@ -54,20 +81,20 @@
     .header-im-logo .i-dot {
       width: 8px;
       height: 8px;
-      background: #ffffff;
+      background: #ffffff !important;
       border-radius: 50%;
       margin-bottom: 2px;
     }
     .header-im-logo .i-stem {
       width: 8px;
       height: 18px;
-      background: #ffffff;
+      background: #ffffff !important;
       border-radius: 1px;
     }
     .header-im-logo .m-text {
       font-size: 34px;
       font-weight: 900;
-      color: #7d7e80;
+      color: #8c8e91;
       line-height: 0.72;
       font-family: Arial, sans-serif;
     }
@@ -81,7 +108,7 @@
     .company-title .white-txt { color: #ffffff; }
 
     .pill-badge {
-      background: #ffffff;
+      background: #ffffff !important;
       color: #00a651;
       font-size: 8.5px;
       font-weight: 900;
@@ -126,17 +153,17 @@
       top: 0;
       bottom: 0;
       width: 3.5px;
-      background: #00a651;
+      background: #00a651 !important;
     }
     .info-row { display: flex; font-size: 9px; font-weight: 800; color: #111; margin-bottom: 4px; }
     .info-label { width: 78px; color: #111; }
     .info-val { color: #111; }
 
-    .bottom-bar { height: 5px; background: #00a651; width: 100%; }
+    .bottom-bar { height: 5px; background: #00a651 !important; width: 100%; }
 
-    /* BACK SIDE DESIGN */
+    /* BACK SIDE */
     .back-header {
-      background: #00a651;
+      background: #00a651 !important;
       padding: 8px 10px;
       margin: 8px 10px 4px 10px;
       border-radius: 4px;
@@ -171,7 +198,7 @@
       margin-top: 8px;
     }
 
-    /* ASSOCIATED CLIENT LOGOS */
+    /* CLIENT LOGOS */
     .client-logos {
       display: flex;
       justify-content: space-around;
@@ -181,12 +208,10 @@
     }
     .client-logos .gp { color: #00a3e0; font-size: 8.5px; font-weight: 900; }
     .client-logos .jti { color: #00a651; font-size: 12px; font-weight: 900; font-style: italic; }
-    
-    /* AKG Crest Emblem */
     .akg-emblem {
       width: 24px;
       height: 24px;
-      background: #e30613;
+      background: #e30613 !important;
       border: 1.5px solid #fecb00;
       border-radius: 50%;
       color: #fff;
@@ -195,11 +220,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 1px #e30613;
     }
     .client-logos .smc { border: 1.2px solid #1a237e; padding: 1px 4px; font-size: 7.5px; color: #1a237e; font-weight: 800; }
 
-    /* BACK MAIN 'im' LOGO */
+    /* WATERMARK LOGO */
     .back-watermark-container {
       text-align: center;
       margin-top: 6px;
@@ -217,14 +241,14 @@
     .back-im-logo .i-dot {
       width: 22px;
       height: 20px;
-      background: #00a651;
+      background: #00a651 !important;
       border-radius: 50%;
       margin-bottom: 4px;
     }
     .back-im-logo .i-stem {
       width: 22px;
       height: 50px;
-      background: #00a651;
+      background: #00a651 !important;
       border-radius: 2px;
     }
     .back-im-logo .m-text {
@@ -243,21 +267,15 @@
       margin-top: 4px;
     }
 
-    /* REAL PDF SIGNATURE REPLICATED EXACTLY */
+    /* NATURAL SIGNATURE FROM PDF */
     .signature-area {
       text-align: right;
       padding-right: 15px;
-      margin-top: -15px;
+      margin-top: -12px;
       margin-bottom: 8px;
     }
-    .sig-svg { width: 100px; height: 38px; display: block; margin-left: auto; margin-bottom: -5px; }
+    .sig-img { width: 90px; height: 35px; object-fit: contain; display: block; margin-left: auto; margin-bottom: -4px; }
     .sig-text { font-size: 8px; font-weight: 800; color: #111; border-top: 1px solid #111; display: inline-block; padding-top: 1px; }
-
-    @media print {
-      body * { visibility: hidden; }
-      .preview-container, .preview-container * { visibility: visible; }
-      .preview-container { position: absolute; left: 0; top: 0; }
-    }
   </style>
 </head>
 <body>
@@ -267,19 +285,19 @@
     <h2>ID Card Details</h2>
     <div class="input-group">
       <label>Full Name</label>
-      <input type="text" id="inName" value="Md Tamim" oninput="updateCard()">
+      <input type="text" id="inName" value="MD SHUVO BISWAS" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>ID No.</label>
-      <input type="text" id="inId" value="5160" oninput="updateCard()">
+      <input type="text" id="inId" value="4523" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>Mobile</label>
-      <input type="text" id="inMobile" value="01608-038005" oninput="updateCard()">
+      <input type="text" id="inMobile" value="01791996607" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>Blood Group</label>
-      <input type="text" id="inBlood" value="O+" oninput="updateCard()">
+      <input type="text" id="inBlood" value="B+" oninput="updateCard()">
     </div>
     <div class="input-group">
       <label>Profile Picture</label>
@@ -296,7 +314,7 @@
     <button class="btn-download" onclick="window.print()">Print / Save PDF</button>
   </div>
 
-  <!-- Cards Preview Area -->
+  <!-- Cards Preview Container -->
   <div class="preview-container">
     
     <!-- FRONT SIDE -->
@@ -320,12 +338,12 @@
           <img id="cardPhoto" src="https://via.placeholder.com/105x115?text=Photo" alt="User Photo">
         </div>
 
-        <div class="user-name" id="cardName">Md Tamim</div>
+        <div class="user-name" id="cardName">MD SHUVO BISWAS</div>
 
         <div class="info-section">
-          <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="cardId">:5160</span></div>
-          <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="cardMobile">: 01608-038005</span></div>
-          <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="cardBlood">:O+</span></div>
+          <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="cardId">:4523</span></div>
+          <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="cardMobile">: 01791996607</span></div>
+          <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="cardBlood">:B+</span></div>
         </div>
       </div>
 
@@ -374,9 +392,9 @@
         </div>
 
         <div class="signature-area">
-          <!-- Exact Authentic Vector Signature Traced From Original PDF -->
-          <svg class="sig-svg" viewBox="0 0 130 50">
-            <path d="M 12 38 Q 30 18 48 8 Q 50 28 55 38 T 68 28 T 72 35 T 82 25 T 90 30 T 112 28" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Exact Authentic Natural Signature Tracing -->
+          <svg class="sig-img" viewBox="0 0 140 50">
+            <path d="M 10 38 Q 32 15 50 6 C 52 25 55 35 58 42 C 60 40 68 28 72 26 C 75 32 76 38 78 35 C 85 24 92 28 95 32 C 102 26 110 28 118 26" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <div class="sig-text">Issuing Authority</div>
         </div>
