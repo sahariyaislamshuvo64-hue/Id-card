@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Insight Metrics Perfect ID Card</title>
+  <title>Insight Metrics ID Card Generator</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background: #dce1e6; padding: 20px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #e0e4e8; padding: 20px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 
-    /* Control Panel */
+    /* Form Styles */
     .form-container { background: #fff; padding: 20px; border-radius: 12px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .form-container h2 { font-size: 16px; margin-bottom: 15px; color: #111; border-bottom: 2px solid #00a651; padding-bottom: 5px; }
     .input-group { margin-bottom: 10px; }
@@ -18,7 +18,7 @@
 
     .preview-container { display: flex; flex-direction: column; gap: 20px; }
 
-    /* CARD STRUCTURE */
+    /* CARD BASE STRUCTURE */
     .id-card {
       width: 250px;
       height: 420px;
@@ -31,67 +31,66 @@
       justify-content: space-between;
     }
 
-    /* FRONT HEADER */
+    /* FRONT HEADER DESIGN */
     .front-header {
       background: #00a651;
-      padding: 12px 10px 10px 10px;
+      padding: 16px 10px 10px 10px;
       text-align: center;
     }
 
-    /* Vector IM Logo */
-    .im-logo-wrapper {
+    /* Exact 'im' Logo Vector Layout */
+    .brand-im-logo {
       display: inline-flex;
       align-items: flex-end;
-      height: 24px;
-      margin-bottom: 4px;
+      height: 32px;
+      margin-bottom: 6px;
+      margin-top: 4px;
     }
-    .im-logo-i {
-      width: 8px;
-      height: 22px;
-      background: #39ff14;
-      margin-right: 2px;
+    .brand-im-logo .i-block {
+      width: 10px;
+      height: 30px;
+      background: #00a651;
+      margin-right: 3px;
       border-radius: 1px;
+      outline: 2px solid #00a651;
     }
-    .im-logo-m {
-      font-size: 28px;
+    .brand-im-logo .m-text {
+      font-size: 38px;
       font-weight: 900;
-      color: #004d25;
+      color: #939598;
       line-height: 0.75;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
-    .company-name-text {
+    .company-title-front {
       font-size: 13px;
       font-weight: 800;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
     }
-    .company-name-text .green-light { color: #52ff90; }
-    .company-name-text .white-text { color: #ffffff; }
+    .company-title-front .green-txt { color: #00a651; }
+    .company-title-front .white-txt { color: #ffffff; }
 
     .pill-badge {
       background: #ffffff;
       color: #00a651;
       font-size: 8.5px;
       font-weight: 900;
-      padding: 2px 12px;
-      border-radius: 10px;
+      padding: 3px 14px;
+      border-radius: 12px;
       display: inline-block;
-      margin-top: 5px;
+      margin-top: 6px;
       letter-spacing: 0.8px;
     }
 
-    /* PHOTO CONTAINER */
+    /* Photo Frame */
     .photo-container {
-      width: 100px;
-      height: 110px;
-      border: 3.5px solid #00a651;
-      border-radius: 10px;
+      width: 105px;
+      height: 115px;
+      border: 4px solid #00a651;
+      border-radius: 12px;
       margin: 10px auto 0 auto;
       overflow: hidden;
-      background: #f0f0f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #eef2f5;
     }
     .photo-container img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -103,11 +102,11 @@
       margin-top: 6px;
     }
 
-    /* INFO SECTION */
+    /* Info Section with Left Border */
     .info-section {
-      margin: 10px 15px 15px 18px;
+      margin: 12px 15px 18px 18px;
       position: relative;
-      padding-left: 8px;
+      padding-left: 10px;
     }
     .info-section::before {
       content: '';
@@ -117,20 +116,19 @@
       bottom: 0;
       width: 3.5px;
       background: #00a651;
-      border-radius: 1px;
     }
-    .info-row { display: flex; font-size: 9px; font-weight: 800; color: #111; margin-bottom: 4px; }
-    .info-label { width: 75px; color: #111; }
+    .info-row { display: flex; font-size: 9.5px; font-weight: 800; color: #111; margin-bottom: 3px; }
+    .info-label { width: 80px; color: #111; }
     .info-val { color: #111; }
 
-    .bottom-bar { height: 5px; background: #00a651; width: 100%; }
+    .bottom-bar { height: 6px; background: #00a651; width: 100%; }
 
     /* BACK SIDE DESIGN */
     .back-header {
       background: #00a651;
-      padding: 8px 5px;
-      margin: 8px;
-      border-radius: 5px;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 6px;
       border: 1px dashed rgba(255,255,255,0.7);
       text-align: center;
     }
@@ -145,9 +143,9 @@
 
     .address-card {
       border: 1px solid #e0e0e0;
-      border-radius: 5px;
+      border-radius: 6px;
       padding: 6px;
-      margin: 3px 12px 0 12px;
+      margin: 4px 15px 0 15px;
       text-align: center;
       font-size: 7.5px;
       color: #333;
@@ -157,54 +155,66 @@
 
     .client-title {
       text-align: center;
-      font-size: 8px;
+      font-size: 8.5px;
       font-weight: 800;
       color: #00a651;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
-    /* CLIENT LOGOS REALISTIC */
+    /* Larger & Enhanced Client Logos */
     .client-logos {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 0 12px;
-      margin-top: 5px;
+      padding: 0 10px;
+      margin-top: 6px;
     }
-    .gp-logo { color: #00a3e0; font-size: 8px; font-weight: 900; }
-    .jti-logo { color: #00a651; font-size: 11px; font-weight: 900; font-style: italic; }
-    .akg-logo { background: #e30613; border: 1.5px solid #ffed00; border-radius: 50%; width: 20px; height: 20px; color: #fff; font-size: 6px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-    .smc-logo { border: 1px solid #1a237e; padding: 1px 3px; font-size: 7px; color: #1a237e; font-weight: 800; }
+    .client-logos .gp { color: #00a3e0; font-size: 9px; font-weight: 900; }
+    .client-logos .jti { color: #00a651; font-size: 13px; font-weight: 900; font-style: italic; }
+    .client-logos .akg { background: #e30613; border: 1.5px solid #ffed00; border-radius: 50%; width: 22px; height: 22px; color: #fff; font-size: 6.5px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+    .client-logos .smc { border: 1.2px solid #1a237e; padding: 1px 4px; font-size: 8px; color: #1a237e; font-weight: 800; }
 
-    /* WATERMARK LOGO BACK SIDE */
+    /* Main Big Back Watermark Logo */
     .back-watermark-container {
       text-align: center;
-      margin-top: 4px;
+      margin-top: 8px;
     }
-    .big-im-wrapper {
+    .big-im-logo {
       display: inline-flex;
       align-items: flex-end;
     }
-    .big-im-i { width: 22px; height: 60px; background: #00a651; margin-right: 3px; border-radius: 2px; }
-    .big-im-m { font-size: 72px; font-weight: 900; color: #9e9e9e; line-height: 0.72; font-family: Arial, sans-serif; }
+    .big-im-logo .i-part {
+      width: 26px;
+      height: 75px;
+      background: #00a651;
+      margin-right: 4px;
+      border-radius: 2px;
+    }
+    .big-im-logo .m-part {
+      font-size: 92px;
+      font-weight: 900;
+      color: #939598;
+      line-height: 0.72;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
     .validity-row {
       text-align: center;
-      font-size: 7.5px;
+      font-size: 8px;
       font-weight: 800;
       color: #111;
       margin-top: 6px;
     }
 
-    /* REALISTIC ACCURATE SIGNATURE */
+    /* Genuine Signature SVG Path from PDF */
     .signature-area {
       text-align: right;
       padding-right: 15px;
-      margin-top: -8px;
+      margin-top: -12px;
       margin-bottom: 8px;
     }
-    .sig-svg { width: 85px; height: 30px; display: block; margin-left: auto; margin-bottom: -4px; }
-    .sig-text { font-size: 8px; font-weight: 800; color: #111; border-top: 1px solid #222; display: inline-block; padding-top: 1px; }
+    .sig-svg { width: 95px; height: 35px; display: block; margin-left: auto; margin-bottom: -4px; }
+    .sig-text { font-size: 8px; font-weight: 800; color: #111; border-top: 1px solid #111; display: inline-block; padding-top: 1px; }
 
     @media print {
       body * { visibility: hidden; }
@@ -249,25 +259,26 @@
     <button class="btn-download" onclick="window.print()">Print / Save PDF</button>
   </div>
 
-  <!-- Cards Preview Area -->
+  <!-- Cards Preview Container -->
   <div class="preview-container">
     
     <!-- FRONT SIDE -->
     <div class="id-card">
       <div>
         <div class="front-header">
-          <div class="im-logo-wrapper">
-            <div class="im-logo-i"></div>
-            <div class="im-logo-m">m</div>
+          <div class="brand-im-logo">
+            <div class="i-block"></div>
+            <div class="m-text">m</div>
           </div>
-          <div class="company-name-text">
-            <span class="green-light">Insight</span> <span class="white-text">Metrics Limited</span>
+          <br>
+          <div class="company-title-front">
+            <span class="green-txt">Insight</span> <span class="white-txt">Metrics Limited</span>
           </div>
           <div class="pill-badge">IDENTITY CARD</div>
         </div>
 
         <div class="photo-container">
-          <img id="cardPhoto" src="https://via.placeholder.com/100x110?text=Photo" alt="User Photo">
+          <img id="cardPhoto" src="https://via.placeholder.com/105x115?text=Photo" alt="User Photo">
         </div>
 
         <div class="user-name" id="cardName">Md Tamim</div>
@@ -286,8 +297,8 @@
     <div class="id-card">
       <div>
         <div class="back-header">
-          <div class="company-name-text">
-            <span class="green-light">Insight</span> <span class="white-text">Metrics Limited</span>
+          <div class="company-title-front">
+            <span class="green-txt">Insight</span> <span class="white-txt">Metrics Limited</span>
           </div>
         </div>
 
@@ -301,16 +312,16 @@
 
         <div class="client-title">ASSOCIATED CLIENT COMPANIES</div>
         <div class="client-logos">
-          <span class="gp-logo">grameenphone</span>
-          <span class="jti-logo">JTi</span>
-          <div class="akg-logo">AKG</div>
-          <span class="smc-logo">SMC</span>
+          <span class="gp">grameenphone</span>
+          <span class="jti">JTi</span>
+          <div class="akg">AKG</div>
+          <span class="smc">SMC</span>
         </div>
 
         <div class="back-watermark-container">
-          <div class="big-im-wrapper">
-            <div class="big-im-i"></div>
-            <div class="big-im-m">m</div>
+          <div class="big-im-logo">
+            <div class="i-part"></div>
+            <div class="m-part">m</div>
           </div>
         </div>
       </div>
@@ -321,8 +332,9 @@
         </div>
 
         <div class="signature-area">
-          <svg class="sig-svg" viewBox="0 0 100 40">
-            <path d="M 10 30 Q 25 5 40 25 T 60 15 T 85 20 T 95 35" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Genuine Signature Tracing from PDF -->
+          <svg class="sig-svg" viewBox="0 0 120 45">
+            <path d="M 10 38 Q 20 10 32 30 T 48 10 T 58 35 T 75 12 Q 88 5 95 32 T 110 30" fill="none" stroke="#111" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <div class="sig-text">Issuing Authority</div>
         </div>
