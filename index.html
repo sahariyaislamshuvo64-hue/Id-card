@@ -3,57 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Insight Metrics ID Card - Perfect Print</title>
+  <title>Bulk ID Card Generator - Insight Metrics</title>
+  <!-- html2pdf.js Library for Direct Colored PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-    
-    /* Ensure background colors print properly */
-    @media print {
-      body { background: transparent !important; padding: 0 !important; }
-      .form-container { display: none !important; }
-      .preview-container { margin: 0 !important; gap: 10px !important; }
-      .id-card { 
-        box-shadow: none !important; 
-        page-break-inside: avoid;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color-adjust: exact !important;
-      }
-    }
+    body { background: #e0e4e8; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
-    body { 
-      background: #e0e4e8; 
-      padding: 20px; 
-      display: flex; 
-      gap: 20px; 
-      justify-content: center; 
-      flex-wrap: wrap; 
+    /* FORM SIDEBAR */
+    .form-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 360px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      max-height: 90vh;
+      overflow-y: auto;
     }
-
-    /* Control Panel Form */
-    .form-container { background: #fff; padding: 20px; border-radius: 12px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: fit-content; }
     .form-container h2 { font-size: 16px; margin-bottom: 15px; color: #111; border-bottom: 2px solid #00a651; padding-bottom: 5px; }
-    .input-group { margin-bottom: 10px; }
-    .input-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #444; }
-    .input-group input { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
-    .btn-download { width: 100%; padding: 10px; background: #00a651; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    
+    .select-card-qty {
+      background: #f0fdf4;
+      border: 1.5px solid #00a651;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .select-card-qty label { font-size: 12px; font-weight: bold; color: #00a651; display: block; margin-bottom: 5px; }
+    .select-card-qty select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; }
 
-    .preview-container { display: flex; flex-direction: column; gap: 20px; }
+    .member-block {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .member-block h3 { font-size: 13px; color: #00a651; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px; }
+    
+    .input-group { margin-bottom: 8px; }
+    .input-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #444; }
+    .input-group input { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
 
-    /* CARD STRUCTURE */
+    .btn-download {
+      width: 100%;
+      padding: 12px;
+      background: #00a651;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(0,166,81,0.3);
+    }
+    .btn-download:hover { background: #008d44; }
+
+    /* PREVIEW CONTAINER */
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .card-pair-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      page-break-after: always;
+      margin-bottom: 20px;
+    }
+
+    /* EXACT ID CARD LAYOUT */
     .id-card {
       width: 250px;
       height: 420px;
-      background: #ffffff;
+      background: #ffffff !important;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      border: 1px solid #ddd;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
-      color-adjust: exact !important;
     }
 
     /* FRONT HEADER */
@@ -65,7 +102,6 @@
       print-color-adjust: exact !important;
     }
 
-    /* Header Logo */
     .header-im-logo {
       display: inline-flex;
       align-items: flex-end;
@@ -96,7 +132,6 @@
       font-weight: 900;
       color: #8c8e91;
       line-height: 0.72;
-      font-family: Arial, sans-serif;
     }
 
     .company-title {
@@ -116,10 +151,8 @@
       border-radius: 10px;
       display: inline-block;
       margin-top: 5px;
-      letter-spacing: 0.5px;
     }
 
-    /* PHOTO FRAME */
     .photo-container {
       width: 105px;
       height: 115px;
@@ -140,7 +173,6 @@
       text-transform: uppercase;
     }
 
-    /* INFO SECTION */
     .info-section {
       margin: 12px 15px 15px 18px;
       position: relative;
@@ -198,7 +230,6 @@
       margin-top: 8px;
     }
 
-    /* CLIENT LOGOS */
     .client-logos {
       display: flex;
       justify-content: space-around;
@@ -223,7 +254,6 @@
     }
     .client-logos .smc { border: 1.2px solid #1a237e; padding: 1px 4px; font-size: 7.5px; color: #1a237e; font-weight: 800; }
 
-    /* WATERMARK LOGO */
     .back-watermark-container {
       text-align: center;
       margin-top: 6px;
@@ -256,7 +286,6 @@
       font-weight: 900;
       color: #9e9e9e;
       line-height: 0.72;
-      font-family: Arial, sans-serif;
     }
 
     .validity-row {
@@ -267,7 +296,6 @@
       margin-top: 4px;
     }
 
-    /* NATURAL SIGNATURE FROM PDF */
     .signature-area {
       text-align: right;
       padding-right: 15px;
@@ -280,149 +308,203 @@
 </head>
 <body>
 
-  <!-- Input Form -->
+  <!-- DYNAMIC INPUT FORM -->
   <div class="form-container">
-    <h2>ID Card Details</h2>
-    <div class="input-group">
-      <label>Full Name</label>
-      <input type="text" id="inName" value="MD SHUVO BISWAS" oninput="updateCard()">
+    <h2>Bulk ID Card Generator</h2>
+    
+    <div class="select-card-qty">
+      <label for="cardCount">কয়টি ID কার্ড তৈরি করতে চান?</label>
+      <select id="cardCount" onchange="renderForms()">
+        <option value="1">1 Person</option>
+        <option value="2">2 Persons</option>
+        <option value="3">3 Persons</option>
+        <option value="4">4 Persons</option>
+        <option value="5">5 Persons</option>
+        <option value="6">6 Persons</option>
+        <option value="7">7 Persons</option>
+        <option value="8">8 Persons</option>
+        <option value="9">9 Persons</option>
+        <option value="10">10 Persons</option>
+      </select>
     </div>
-    <div class="input-group">
-      <label>ID No.</label>
-      <input type="text" id="inId" value="4523" oninput="updateCard()">
-    </div>
-    <div class="input-group">
-      <label>Mobile</label>
-      <input type="text" id="inMobile" value="01791996607" oninput="updateCard()">
-    </div>
-    <div class="input-group">
-      <label>Blood Group</label>
-      <input type="text" id="inBlood" value="B+" oninput="updateCard()">
-    </div>
-    <div class="input-group">
-      <label>Profile Picture</label>
-      <input type="file" id="inPhoto" accept="image/*" onchange="loadPhoto(event)">
-    </div>
-    <div class="input-group">
-      <label>Issue Date</label>
-      <input type="text" id="inIssue" value="01-02-2024" oninput="updateCard()">
-    </div>
-    <div class="input-group">
-      <label>Expire Date</label>
-      <input type="text" id="inExpire" value="12-31-2028" oninput="updateCard()">
-    </div>
-    <button class="btn-download" onclick="window.print()">Print / Save PDF</button>
+
+    <!-- Member Forms will render here dynamically -->
+    <div id="formsWrapper"></div>
+
+    <button class="btn-download" onclick="downloadAllPDF()">Download All PDF (Single File)</button>
   </div>
 
-  <!-- Cards Preview Container -->
-  <div class="preview-container">
-    
-    <!-- FRONT SIDE -->
-    <div class="id-card">
-      <div>
-        <div class="front-header">
-          <div class="header-im-logo">
-            <div class="dot-i-stem">
-              <div class="i-dot"></div>
-              <div class="i-stem"></div>
-            </div>
-            <div class="m-text">m</div>
-          </div>
-          <div class="company-title">
-            <span class="light-green">Insight</span> <span class="white-txt">Metrics Limited</span>
-          </div>
-          <div class="pill-badge">IDENTITY CARD</div>
-        </div>
-
-        <div class="photo-container">
-          <img id="cardPhoto" src="https://via.placeholder.com/105x115?text=Photo" alt="User Photo">
-        </div>
-
-        <div class="user-name" id="cardName">MD SHUVO BISWAS</div>
-
-        <div class="info-section">
-          <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="cardId">:4523</span></div>
-          <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="cardMobile">: 01791996607</span></div>
-          <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="cardBlood">:B+</span></div>
-        </div>
-      </div>
-
-      <div class="bottom-bar"></div>
-    </div>
-
-    <!-- BACK SIDE -->
-    <div class="id-card">
-      <div>
-        <div class="back-header">
-          <div class="company-title">
-            <span class="light-green">Insight</span> <span class="white-txt">Metrics Limited</span>
-          </div>
-        </div>
-
-        <div class="office-location-title">OFFICE LOCATION</div>
-        <div class="address-card">
-          House #10, Suite #203, Level #1, Road #8<br>
-          Gulshan #1, Dhaka 1212, Bangladesh<br>
-          <b>Call:</b> 01311930805 |<br>
-          www.insightmetricsbd.com
-        </div>
-
-        <div class="client-title">ASSOCIATED CLIENT COMPANIES</div>
-        <div class="client-logos">
-          <span class="gp">grameenphone</span>
-          <span class="jti">JTi</span>
-          <div class="akg-emblem">AKG</div>
-          <span class="smc">SMC</span>
-        </div>
-
-        <div class="back-watermark-container">
-          <div class="back-im-logo">
-            <div class="dot-i-stem">
-              <div class="i-dot"></div>
-              <div class="i-stem"></div>
-            </div>
-            <div class="m-text">m</div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="validity-row">
-          Issue Date: <span id="cardIssue">01-02-2024</span> | Expire Date: <span id="cardExpire">12-31-2028</span>
-        </div>
-
-        <div class="signature-area">
-          <!-- Exact Authentic Natural Signature Tracing -->
-          <svg class="sig-img" viewBox="0 0 140 50">
-            <path d="M 10 38 Q 32 15 50 6 C 52 25 55 35 58 42 C 60 40 68 28 72 26 C 75 32 76 38 78 35 C 85 24 92 28 95 32 C 102 26 110 28 118 26" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <div class="sig-text">Issuing Authority</div>
-        </div>
-        <div class="bottom-bar"></div>
-      </div>
-    </div>
-
+  <!-- PREVIEW RENDER AREA -->
+  <div class="preview-container" id="pdfArea">
+    <!-- ID Cards will generate here dynamic -->
   </div>
 
   <script>
-    function updateCard() {
-      document.getElementById('cardName').innerText = document.getElementById('inName').value;
-      document.getElementById('cardId').innerText = ":" + document.getElementById('inId').value;
-      document.getElementById('cardMobile').innerText = ": " + document.getElementById('inMobile').value;
-      document.getElementById('cardBlood').innerText = ":" + document.getElementById('inBlood').value;
-      document.getElementById('cardIssue').innerText = document.getElementById('inIssue').value;
-      document.getElementById('cardExpire').innerText = document.getElementById('inExpire').value;
+    // Initial Dynamic Form Generator
+    function renderForms() {
+      const count = parseInt(document.getElementById('cardCount').value);
+      const formsWrapper = document.getElementById('formsWrapper');
+      const pdfArea = document.getElementById('pdfArea');
+
+      formsWrapper.innerHTML = '';
+      pdfArea.innerHTML = '';
+
+      for (let i = 1; i <= count; i++) {
+        // Render Form Input Blocks
+        formsWrapper.innerHTML += `
+          <div class="member-block">
+            <h3>Card #${i} Information</h3>
+            <div class="input-group">
+              <label>Full Name</label>
+              <input type="text" id="name_${i}" value="MD SHUVO BISWAS" oninput="updateCards()">
+            </div>
+            <div class="input-group">
+              <label>ID No.</label>
+              <input type="text" id="id_${i}" value="${4520 + i}" oninput="updateCards()">
+            </div>
+            <div class="input-group">
+              <label>Mobile</label>
+              <input type="text" id="mobile_${i}" value="01791996607" oninput="updateCards()">
+            </div>
+            <div class="input-group">
+              <label>Blood Group</label>
+              <input type="text" id="blood_${i}" value="B+" oninput="updateCards()">
+            </div>
+            <div class="input-group">
+              <label>Profile Photo</label>
+              <input type="file" accept="image/*" onchange="loadPhoto(event, ${i})">
+            </div>
+          </div>
+        `;
+
+        // Render Cards View
+        pdfArea.innerHTML += `
+          <div class="card-pair-wrapper">
+            <!-- FRONT SIDE -->
+            <div class="id-card">
+              <div>
+                <div class="front-header">
+                  <div class="header-im-logo">
+                    <div class="dot-i-stem">
+                      <div class="i-dot"></div>
+                      <div class="i-stem"></div>
+                    </div>
+                    <div class="m-text">m</div>
+                  </div>
+                  <div class="company-title">
+                    <span class="light-green">Insight</span> <span class="white-txt">Metrics Limited</span>
+                  </div>
+                  <div class="pill-badge">IDENTITY CARD</div>
+                </div>
+
+                <div class="photo-container">
+                  <img id="photo_preview_${i}" src="https://via.placeholder.com/105x115?text=Photo" alt="User Photo">
+                </div>
+
+                <div class="user-name" id="view_name_${i}">MD SHUVO BISWAS</div>
+
+                <div class="info-section">
+                  <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="view_id_${i}">:${4520 + i}</span></div>
+                  <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="view_mobile_${i}">: 01791996607</span></div>
+                  <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="view_blood_${i}">:B+</span></div>
+                </div>
+              </div>
+              <div class="bottom-bar"></div>
+            </div>
+
+            <!-- BACK SIDE -->
+            <div class="id-card">
+              <div>
+                <div class="back-header">
+                  <div class="company-title">
+                    <span class="light-green">Insight</span> <span class="white-txt">Metrics Limited</span>
+                  </div>
+                </div>
+
+                <div class="office-location-title">OFFICE LOCATION</div>
+                <div class="address-card">
+                  House #10, Suite #203, Level #1, Road #8<br>
+                  Gulshan #1, Dhaka 1212, Bangladesh<br>
+                  <b>Call:</b> 01311930805 |<br>
+                  www.insightmetricsbd.com
+                </div>
+
+                <div class="client-title">ASSOCIATED CLIENT COMPANIES</div>
+                <div class="client-logos">
+                  <span class="gp">grameenphone</span>
+                  <span class="jti">JTi</span>
+                  <div class="akg-emblem">AKG</div>
+                  <span class="smc">SMC</span>
+                </div>
+
+                <div class="back-watermark-container">
+                  <div class="back-im-logo">
+                    <div class="dot-i-stem">
+                      <div class="i-dot"></div>
+                      <div class="i-stem"></div>
+                    </div>
+                    <div class="m-text">m</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="validity-row">
+                  Issue Date: 01-02-2024 | Expire Date: 12-31-2028
+                </div>
+
+                <div class="signature-area">
+                  <svg class="sig-img" viewBox="0 0 140 50">
+                    <path d="M 10 38 Q 32 15 50 6 C 52 25 55 35 58 42 C 60 40 68 28 72 26 C 75 32 76 38 78 35 C 85 24 92 28 95 32 C 102 26 110 28 118 26" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <div class="sig-text">Issuing Authority</div>
+                </div>
+                <div class="bottom-bar"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
     }
 
-    function loadPhoto(event) {
+    // Live Synchronize Form Data to ID Card View
+    function updateCards() {
+      const count = parseInt(document.getElementById('cardCount').value);
+      for (let i = 1; i <= count; i++) {
+        document.getElementById(`view_name_${i}`).innerText = document.getElementById(`name_${i}`).value;
+        document.getElementById(`view_id_${i}`).innerText = ":" + document.getElementById(`id_${i}`).value;
+        document.getElementById(`view_mobile_${i}`).innerText = ": " + document.getElementById(`mobile_${i}`).value;
+        document.getElementById(`view_blood_${i}`).innerText = ":" + document.getElementById(`blood_${i}`).value;
+      }
+    }
+
+    // Dynamic Photo Load
+    function loadPhoto(event, idIndex) {
       const reader = new FileReader();
       reader.onload = function() {
-        document.getElementById('cardPhoto').src = reader.result;
+        document.getElementById(`photo_preview_${idIndex}`).src = reader.result;
       }
       if(event.target.files[0]){
         reader.readAsDataURL(event.target.files[0]);
       }
     }
+
+    // Export High-Quality PDF Function
+    function downloadAllPDF() {
+      const element = document.getElementById('pdfArea');
+      const opt = {
+        margin:       10,
+        filename:     'Bulk_Insight_Metrics_ID_Cards.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // Execute Initial Render
+    window.onload = renderForms;
   </script>
 </body>
 </html>
