@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Insight Metrics ID Card Generator</title>
+  <title>Insight Metrics ID Card Generator - Ultra Premium</title>
   <!-- html2pdf.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-    body { background: #e0e4e8; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #dce2e8; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
     /* FORM SIDEBAR */
     .form-container {
-      background: #fff;
+      background: #ffffff;
       padding: 20px;
       border-radius: 12px;
       width: 340px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
       max-height: 90vh;
       overflow-y: auto;
     }
@@ -69,7 +69,7 @@
       gap: 20px;
     }
 
-    /* EXACT A4 PAGE FIX FOR PDF (Fits 2 Sets Per Page Perfectly) */
+    /* A4 PAGE FIX FOR 2 SETS PER PAGE */
     .pdf-page {
       width: 210mm;
       height: 290mm;
@@ -92,27 +92,29 @@
       align-items: center;
     }
 
-    /* ID CARD LAYOUT */
+    /* UNIQUE ID CARD LAYOUT */
     .id-card {
-      width: 65mm;
-      height: 110mm;
+      width: 66mm;
+      height: 112mm;
       background: #ffffff !important;
       position: relative;
       overflow: hidden;
-      border: 1px solid #d0d0d0;
+      border: 1.5px solid #00a651;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      border-radius: 6px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
 
-    /* FRONT HEADER */
+    /* FRONT HEADER WITH UNIQUE ACCENT */
     .front-header {
-      background: #00a651 !important;
+      background: linear-gradient(135deg, #00a651 0%, #008d44 100%) !important;
       padding: 10px 8px 6px 8px;
       text-align: center;
+      position: relative;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -145,14 +147,14 @@
     .header-im-logo .m-text {
       font-size: 26px;
       font-weight: 900;
-      color: #8c8e91;
+      color: #ffffff;
       line-height: 0.72;
     }
 
     .company-title {
       font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.1px;
+      letter-spacing: 0.2px;
     }
     .company-title .light-green { color: #80ff80; }
     .company-title .white-txt { color: #ffffff; }
@@ -160,38 +162,42 @@
     .pill-badge {
       background: #ffffff !important;
       color: #00a651;
-      font-size: 7px;
+      font-size: 7.5px;
       font-weight: 900;
       padding: 2px 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       display: inline-block;
       margin-top: 4px;
+      letter-spacing: 0.5px;
     }
 
     .photo-container {
-      width: 85px;
-      height: 95px;
-      border: 2.5px solid #00a651;
-      border-radius: 10px;
+      width: 88px;
+      height: 98px;
+      border: 3px solid #00a651;
+      border-radius: 12px;
       margin: 6px auto 0 auto;
       overflow: hidden;
       background: #f4f4f4;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     .photo-container img { width: 100%; height: 100%; object-fit: cover; }
 
     .user-name {
       text-align: center;
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 900;
       color: #00a651;
       margin-top: 5px;
       text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
+    /* LARGE & PROMINENT INFO SECTION */
     .info-section {
-      margin: 8px 12px 10px 14px;
+      margin: 6px 10px 8px 12px;
       position: relative;
-      padding-left: 6px;
+      padding-left: 8px;
     }
     .info-section::before {
       content: '';
@@ -199,18 +205,19 @@
       left: 0;
       top: 0;
       bottom: 0;
-      width: 3px;
+      width: 4px;
       background: #00a651 !important;
+      border-radius: 2px;
     }
-    .info-row { display: flex; font-size: 7.5px; font-weight: 800; color: #111; margin-bottom: 3px; }
-    .info-label { width: 62px; color: #111; }
-    .info-val { color: #111; }
+    .info-row { display: flex; font-size: 9px; font-weight: 900; color: #000; margin-bottom: 4px; }
+    .info-label { width: 68px; color: #111; font-weight: 900; }
+    .info-val { color: #000; font-weight: 900; font-size: 9.5px; }
 
-    .bottom-bar { height: 4px; background: #00a651 !important; width: 100%; }
+    .bottom-bar { height: 5px; background: #00a651 !important; width: 100%; }
 
-    /* BACK SIDE */
+    /* BACK SIDE STYLING */
     .back-header {
-      background: #00a651 !important;
+      background: linear-gradient(135deg, #00a651 0%, #008d44 100%) !important;
       padding: 6px 8px;
       margin: 6px 8px 4px 8px;
       border-radius: 4px;
@@ -219,28 +226,29 @@
 
     .office-location-title {
       text-align: center;
-      font-size: 7.5px;
-      font-weight: 800;
+      font-size: 8px;
+      font-weight: 900;
       color: #00a651;
-      margin-top: 3px;
+      margin-top: 2px;
     }
 
     .address-card {
       border: 1px solid #d0d0d0;
-      border-radius: 4px;
+      border-radius: 5px;
       padding: 5px;
       margin: 2px 10px 0 10px;
       text-align: center;
-      font-size: 6.5px;
+      font-size: 6.8px;
       color: #222;
-      line-height: 1.3;
-      font-weight: 600;
+      line-height: 1.35;
+      font-weight: 700;
+      background: #fafafa;
     }
 
     .client-title {
       text-align: center;
-      font-size: 7px;
-      font-weight: 800;
+      font-size: 7.5px;
+      font-weight: 900;
       color: #00a651;
       margin-top: 6px;
     }
@@ -252,7 +260,7 @@
       padding: 0 8px;
       margin-top: 4px;
     }
-    .client-logos .gp { color: #00a3e0; font-size: 7.5px; font-weight: 900; }
+    .client-logos .gp { color: #00a3e0; font-size: 8px; font-weight: 900; }
     .client-logos .jti { color: #00a651; font-size: 10px; font-weight: 900; font-style: italic; }
     .akg-emblem {
       width: 20px;
@@ -271,7 +279,7 @@
 
     .back-watermark-container {
       text-align: center;
-      margin-top: 4px;
+      margin-top: 3px;
     }
     .back-im-logo {
       display: inline-flex;
@@ -299,18 +307,19 @@
     .back-im-logo .m-text {
       font-size: 68px;
       font-weight: 900;
-      color: #9e9e9e;
+      color: #bebebe;
       line-height: 0.72;
     }
 
     .validity-row {
       text-align: center;
-      font-size: 7px;
+      font-size: 7.5px;
       font-weight: 800;
       color: #111;
-      margin-top: 3px;
+      margin-top: 2px;
     }
 
+    /* REAL NATURAL SIGNATURE */
     .signature-area {
       text-align: right;
       padding-right: 12px;
@@ -318,7 +327,7 @@
       margin-bottom: 5px;
     }
     .sig-img { width: 75px; height: 28px; object-fit: contain; display: block; margin-left: auto; margin-bottom: -3px; }
-    .sig-text { font-size: 7px; font-weight: 800; color: #111; border-top: 1px solid #111; display: inline-block; padding-top: 1px; }
+    .sig-text { font-size: 7px; font-weight: 900; color: #111; border-top: 1px solid #111; display: inline-block; padding-top: 1px; }
   </style>
 </head>
 <body>
@@ -365,7 +374,7 @@
       let pageDiv = null;
 
       for (let i = 1; i <= count; i++) {
-        // Render Form Inputs
+        // Form Inputs
         formsWrapper.innerHTML += `
           <div class="member-block">
             <h3>Card #${i} Information</h3>
@@ -392,14 +401,14 @@
           </div>
         `;
 
-        // Create a new Page every 2 cards
+        // Create a new A4 Page every 2 cards
         if ((i - 1) % 2 === 0) {
           pageDiv = document.createElement('div');
           pageDiv.className = 'pdf-page';
           pdfArea.appendChild(pageDiv);
         }
 
-        // Render Card Pair
+        // Render Unique ID Cards
         const pairHTML = `
           <div class="card-pair-wrapper">
             <!-- FRONT SIDE -->
@@ -477,7 +486,7 @@
 
                 <div class="signature-area">
                   <svg class="sig-img" viewBox="0 0 140 50">
-                    <path d="M 10 38 Q 32 15 50 6 C 52 25 55 35 58 42 C 60 40 68 28 72 26 C 75 32 76 38 78 35 C 85 24 92 28 95 32 C 102 26 110 28 118 26" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M 10 38 Q 32 15 50 6 C 52 25 55 35 58 42 C 60 40 68 28 72 26 C 75 32 76 38 78 35 C 85 24 92 28 95 32 C 102 26 110 28 118 26" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   <div class="sig-text">Issuing Authority</div>
                 </div>
