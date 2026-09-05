@@ -3,82 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>মার্চেন্ট ও শপ ট্র্যাকার ড্যাশবোর্ড</title>
-  <!-- PDF.js Library -->
+  <title>পিডিএফ অটো-এনালাইসিস ও শপ ট্র্যাকার</title>
+  <!-- PDF.js Library for Reading PDF Text -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f1f5f9; color: #1e293b; padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 15px; }
+    .container { max-width: 1000px; margin: 0 auto; }
     
-    h2 { text-align: center; margin-bottom: 20px; color: #0f172a; }
-    
-    /* Upload Box */
-    .upload-card { background: #fff; padding: 25px; border-radius: 12px; border: 2px dashed #0284c7; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    h2 { text-align: center; margin-bottom: 20px; color: #0f172a; font-size: 20px; }
+
+    /* File Upload Card */
+    .upload-card { background: #fff; padding: 20px; border-radius: 10px; border: 2px dashed #0284c7; text-align: center; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .upload-card input { display: none; }
-    .upload-btn { background: #0284c7; color: white; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-block; transition: 0.3s; }
+    .upload-btn { background: #0284c7; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-block; transition: 0.2s; font-size: 14px; }
     .upload-btn:hover { background: #0369a1; }
 
     /* Floor Summary Cards Grid */
-    .floor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .floor-card { background: #fff; padding: 15px; border-radius: 10px; border-left: 5px solid #0284c7; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .floor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .floor-card { background: #fff; padding: 12px; border-radius: 8px; border-left: 4px solid #0284c7; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .floor-card:hover, .floor-card.active { background: #e0f2fe; border-left-color: #0369a1; transform: translateY(-2px); }
-    .floor-card h4 { font-size: 15px; color: #334155; }
-    .floor-card p { font-size: 20px; font-weight: bold; color: #0284c7; margin-top: 5px; }
+    .floor-card h4 { font-size: 12px; color: #475569; }
+    .floor-card p { font-size: 16px; font-weight: bold; color: #0284c7; margin-top: 4px; }
 
-    /* Search & Table Controls */
-    .table-container { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .search-box { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+    /* Table Section */
+    .table-container { background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .search-box { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; font-size: 14px; outline: none; }
+    .search-box:focus { border-color: #0284c7; }
     
     table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-    th { background: #f8fafc; color: #475569; }
-    tr.shop-row { cursor: pointer; transition: 0.2s; }
-    tr.shop-row:hover { background: #f1f5f9; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    th { background: #f8fafc; color: #475569; font-weight: 600; }
+    tr.shop-row { cursor: pointer; }
+    tr.shop-row:hover { background: #f8fafc; }
+
+    .btn-detail { background: #0284c7; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-detail:hover { background: #0369a1; }
 
     /* Modal / Pop-up for Shop Details */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .close-btn { position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; font-weight: bold; color: #64748b; }
-    .detail-item { margin-bottom: 12px; }
-    .detail-item label { font-size: 12px; color: #64748b; display: block; font-weight: bold; }
-    .detail-item span { font-size: 15px; color: #0f172a; font-weight: 600; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 10px; width: 100%; max-width: 450px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .close-btn { position: absolute; top: 12px; right: 15px; font-size: 22px; cursor: pointer; color: #64748b; font-weight: bold; }
+    .detail-item { margin-bottom: 10px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 5px; }
+    .detail-item label { font-size: 11px; color: #64748b; display: block; font-weight: bold; text-transform: uppercase; }
+    .detail-item span { font-size: 14px; color: #0f172a; font-weight: 600; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>মার্চেন্ট ও শপ অটো-ট্র্যাকার ড্যাশবোর্ড</h2>
+  <h2>পিডিএফ অটো-এনালাইসিস ও মার্চেন্ট ট্র্যাকার</h2>
 
-  <!-- Upload Area -->
+  <!-- PDF Upload Section -->
   <div class="upload-card">
-    <label for="pdfFile" class="upload-btn">📁 PDF ফাইল আপলোড করুন</label>
+    <label for="pdfFile" class="upload-btn">📁 যেকোনো PDF আপলোড করুন</label>
     <input type="file" id="pdfFile" accept=".pdf">
-    <p id="fileName" style="margin-top: 10px; font-size: 13px; color: #64748b;"></p>
+    <p id="fileName" style="margin-top: 8px; font-size: 12px; color: #64748b;"></p>
   </div>
 
-  <!-- Floor Summaries (ফ্লোর অনুযায়ী কতটি দোকান) -->
-  <div class="floor-grid" id="floorSummary">
-    <!-- Dynamic Floor Cards Will Appear Here -->
-  </div>
+  <!-- Dynamic Floor Counts Cards -->
+  <div class="floor-grid" id="floorSummary"></div>
 
-  <!-- Data Table -->
+  <!-- Table Section -->
   <div class="table-container">
-    <input type="text" id="searchInput" class="search-box" placeholder="দোকানের নাম, ওয়ালেট বা নম্বর দিয়ে ফিল্টার করুন...">
+    <input type="text" id="searchInput" class="search-box" placeholder="দোকানের নাম, ওয়ালেট, SL বা ঠিকানা দিয়ে ফিল্টার করুন...">
     <div style="overflow-x: auto;">
       <table>
         <thead>
           <tr>
             <th>SL</th>
-            <th>মার্চেন্টের নাম / শপ</th>
-            <th>মার্চেন্ট ওয়ালেট নম্বর</th>
+            <th>মার্চেন্ট / দোকানের নাম</th>
+            <th>ওয়ালেট নম্বর</th>
             <th>ফ্লোর</th>
             <th>অ্যাকশন</th>
           </tr>
         </thead>
         <tbody id="tableBody">
           <tr>
-            <td colspan="5" style="text-align: center; color: #94a3b8;">PDF ফাইল আপলোড করলে ডাটা লোড হবে।</td>
+            <td colspan="5" style="text-align: center; color: #94a3b8;">অনুগ্রহ করে একটি PDF আপলোড করুন।</td>
           </tr>
         </tbody>
       </table>
@@ -86,101 +88,138 @@
   </div>
 </div>
 
-<!-- Modal Pop-up (দোকানের বিস্তারিত ডিটেইলস দেখানোর জন্য) -->
+<!-- Modal Pop-up for Shop Details -->
 <div class="modal" id="shopModal">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal()">&times;</span>
-    <h3 style="margin-bottom: 15px; color: #0284c7;">দোকানের পূর্ণাঙ্গ বিবরণ</h3>
+    <h3 style="margin-bottom: 15px; color: #0284c7; font-size: 16px;">দোকানের পূর্ণাঙ্গ বিবরণ</h3>
     
     <div class="detail-item"><label>সিরিয়াল নম্বর (SL):</label><span id="mSL">-</span></div>
     <div class="detail-item"><label>মার্চেন্ট / দোকানের নাম:</label><span id="mName">-</span></div>
     <div class="detail-item"><label>মার্চেন্ট ওয়ালেট নম্বর:</label><span id="mWallet">-</span></div>
     <div class="detail-item"><label>অবস্থান / ফ্লোর:</label><span id="mFloor">-</span></div>
-    <div class="detail-item"><label>সম্পূর্ণ ঠিকানা:</label><span id="mAddress">-</span></div>
-    <div class="detail-item"><label>ক্যাটাগরি:</label><span id="mCategory">-</span></div>
+    <div class="detail-item"><label>দোকান নম্বর ও ঠিকানা:</label><span id="mAddress">-</span></div>
   </div>
 </div>
 
 <script>
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-  let allShops = [];
+  let analyzedData = [];
   let selectedFloorFilter = 'ALL';
 
+  // PDF আপলোড ও এনালাইসিস হ্যান্ডলার
   document.getElementById('pdfFile').addEventListener('change', async function(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    document.getElementById('fileName').textContent = "প্রসেস হচ্ছে: " + file.name;
+    document.getElementById('fileName').textContent = "এনালাইসিস করা হচ্ছে: " + file.name;
 
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
 
-    let fullTextBlocks = [];
+      let extractedLines = [];
 
-    // পিডিএফ এর সব পেজ পড়ে তথ্য নেওয়া
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageStrings = textContent.items.map(item => item.str);
-      fullTextBlocks.push(...pageStrings);
+      // পিডিএফের প্রতিটি পেজ থেকে টেক্সট এক্সট্র্যাক্ট করা
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        
+        let lastY = null;
+        let lineText = "";
+        
+        // লাইন অনুযায়ী টেক্সট একত্রিত করার লজিক
+        textContent.items.forEach(item => {
+          if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+            if (lineText.trim()) extractedLines.push(lineText.trim());
+            lineText = "";
+          }
+          lineText += " " + item.str;
+          lastY = item.transform[5];
+        });
+        if (lineText.trim()) extractedLines.push(lineText.trim());
+      }
+
+      // এনালাইজার রান করা
+      processExtractedLines(extractedLines);
+    } catch (err) {
+      alert("পিডিএফ প্রসেস করতে সমস্যা হয়েছে। দয়া করে সঠিক ফাইলটি আপলোড দিন।");
     }
-
-    parsePdfData(fullTextBlocks);
   });
 
-  // পিডিএফের ডাটা প্রসেস ও ফিল্টারিং লজিক
-  function parsePdfData(blocks) {
-    allShops = [];
-    let text = blocks.join(" ");
-    
-    // ১১ ডিজিটের ওয়ালেট নম্বর দিয়ে আলাদা করে ডাটা এক্সট্র্যাক্ট করা
-    const pattern = /(2\d{5}|\d{5,6})\s*\|\s*Savar\s*\|\s*(\d{10,11})[\s\S]*?(?=2\d{5}|\d{5,6}\s*\|\s*Savar|$)/gi;
-    let match;
+  // স্মার্ট টেক্সট পার্সার লজিক
+  function processExtractedLines(lines) {
+    analyzedData = [];
+    let fullContent = lines.join("\n");
 
-    let count = 1;
-    while ((match = pattern.exec(text)) !== null) {
-      let block = match[0];
+    // ১০ বা ১১ ডিজিটের মোবাইল/ওয়ালেট নম্বর এবং অন্যান্য তথ্য এনালাইসিস
+    let blocks = fullContent.split(/(?=\b\d{10,11}\b|\bSL[-:]?\s*\d+)/i);
+
+    let autoSL = 1;
+
+    lines.forEach(line => {
+      let walletMatch = line.match(/\b(01\d{9}|1\d{9})\b/);
       
-      let slMatch = block.match(/^(2\d{5}|\d{5,6})/);
-      let walletMatch = block.match(/\b(1\d{9})\b/);
-      
-      // ফ্লোর সনাক্তকরণ
-      let floor = "Ground Floor";
-      if (/3rd|level\. 3/i.test(block)) floor = "3rd Floor";
-      else if (/2nd|2rd/i.test(block)) floor = "2nd Floor";
-      else if (/1st/i.test(block)) floor = "1st Floor";
-      else if (/besment|underground|basement/i.test(block)) floor = "Basement";
+      if (walletMatch) {
+        let wallet = walletMatch[0];
+        let slMatch = line.match(/^\d{1,4}/) || line.match(/SL[-:]?\s*(\d+)/i);
+        let sl = slMatch ? slMatch[0] : autoSL++;
 
-      // মার্চেন্টের নাম ও এড্রেস টেক্সট ক্লিন করা
-      let cleanText = block.replace(/\|/g, " ").replace(/\s+/g, " ");
+        // ফ্লোর এনালাইসিস
+        let floor = detectFloor(line);
 
-      allShops.push({
-        sl: slMatch ? slMatch[0] : count++,
-        wallet: walletMatch ? walletMatch[0] : "N/A",
-        floor: floor,
-        name: extractMerchantName(cleanText),
-        address: cleanText,
-        category: /Super Active/i.test(block) ? "Super Active" : (/Moderate/i.test(block) ? "Moderate" : "New")
-      });
-    }
+        // দোকানের নাম ও ঠিকানা এনালাইসিস
+        let name = extractShopName(line, wallet);
+
+        analyzedData.push({
+          sl: sl,
+          name: name,
+          wallet: wallet,
+          floor: floor,
+          address: line.replace(/\s+/g, ' ').trim()
+        });
+      }
+    });
 
     renderSummaryCards();
     renderTable();
   }
 
-  function extractMerchantName(text) {
-    let knownNames = text.match(/(AL ARAF ORNA HOUSE|Ayush Panjabi|Time Pass|Sajal Jewellers|FRENZY|BHUIYAN LEATHER|OUTFIT|yummy tasty|Gifts Zone|PRINTER SERVICE|MIM EXPORT HOUSE)/i);
-    return knownNames ? knownNames[0] : "Merchant Shop";
+  // ফ্লোর সনাক্তকরণ অ্যালগরিদম (১০ম ফ্লোর পর্যন্ত)
+  function detectFloor(text) {
+    let t = text.toLowerCase();
+    if (t.includes('10th')) return '10th Floor';
+    if (t.includes('9th')) return '9th Floor';
+    if (t.includes('8th')) return '8th Floor';
+    if (t.includes('7th')) return '7th Floor';
+    if (t.includes('6th')) return '6th Floor';
+    if (t.includes('5th')) return '5th Floor';
+    if (t.includes('4th')) return '4th Floor';
+    if (t.includes('3rd') || t.includes('level 3') || t.includes('level-3')) return '3rd Floor';
+    if (t.includes('2nd') || t.includes('2rd') || t.includes('level 2')) return '2nd Floor';
+    if (t.includes('1st') || t.includes('level 1')) return '1st Floor';
+    if (t.includes('besment') || t.includes('underground') || t.includes('basement') || t.includes('under ground')) return 'Basement';
+    
+    return 'Ground Floor';
   }
 
-  // ফ্লোর ভিত্তিক সামারি তৈরি (কোন ফ্লোরে কয়টি দোকান)
-  function renderSummaryCards() {
-    const counts = { "ALL": allShops.length, "Basement": 0, "Ground Floor": 0, "1st Floor": 0, "2nd Floor": 0, "3rd Floor": 0 };
+  // শপ/মার্চেন্টের নাম আলাদা করার লজিক
+  function extractShopName(line, wallet) {
+    let parts = line.split(wallet);
+    let beforeWallet = parts[0] ? parts[0].trim() : "";
+    
+    // নম্বর এবং অপ্রয়োজনীয় সংকেত দূর করা
+    let cleanName = beforeWallet.replace(/^\d+[\s\.\|-]*/, '').replace(/\|/g, '').trim();
+    return cleanName.length > 2 ? cleanName : "মার্চেন্ট শপ";
+  }
 
-    allShops.forEach(shop => {
-      if (counts[shop.floor] !== undefined) counts[shop.floor]++;
-      else counts[shop.floor] = 1;
+  // ফ্লোর ভিত্তিক সামারি তৈরি
+  function renderSummaryCards() {
+    const counts = { "ALL": analyzedData.length };
+
+    analyzedData.forEach(shop => {
+      counts[shop.floor] = (counts[shop.floor] || 0) + 1;
     });
 
     const summaryContainer = document.getElementById('floorSummary');
@@ -204,35 +243,36 @@
     renderTable();
   }
 
-  // টেবিল রেন্ডারিং
+  // টেবিল ডাটা রেন্ডারিং
   function renderTable() {
     const tbody = document.getElementById('tableBody');
     const searchVal = document.getElementById('searchInput').value.toLowerCase();
     tbody.innerHTML = '';
 
-    const filtered = allShops.filter(shop => {
+    const filtered = analyzedData.filter(shop => {
       const matchFloor = selectedFloorFilter === 'ALL' || shop.floor === selectedFloorFilter;
       const matchSearch = shop.name.toLowerCase().includes(searchVal) || 
                           shop.wallet.includes(searchVal) || 
+                          String(shop.sl).includes(searchVal) ||
                           shop.address.toLowerCase().includes(searchVal);
       return matchFloor && matchSearch;
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">কোনো দোকান পাওয়া যায়নি।</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #94a3b8;">কোনো ডাটা পাওয়া যায়নি।</td></tr>`;
       return;
     }
 
     filtered.forEach(shop => {
       const tr = document.createElement('tr');
       tr.className = 'shop-row';
-      tr.onclick = () => openModal(shop); // দোকানে ক্লিক করলে পপ-আপ ওপেন হবে
+      tr.onclick = () => openModal(shop);
       tr.innerHTML = `
         <td>${shop.sl}</td>
         <td><strong>${shop.name}</strong></td>
         <td>${shop.wallet}</td>
-        <td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${shop.floor}</span></td>
-        <td><button style="background:#0284c7; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">বিস্তারিত দেখুন</button></td>
+        <td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold;">${shop.floor}</span></td>
+        <td><button class="btn-detail">দেখুন</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -240,14 +280,13 @@
 
   document.getElementById('searchInput').addEventListener('input', renderTable);
 
-  // পপ-আপ মডাল সার্ভিস (দোকানের সম্পূর্ণ ডিটেইলস)
+  // পপ-আপ মডাল সার্ভিস (ডিটেইলস)
   function openModal(shop) {
     document.getElementById('mSL').textContent = shop.sl;
     document.getElementById('mName').textContent = shop.name;
     document.getElementById('mWallet').textContent = shop.wallet;
     document.getElementById('mFloor').textContent = shop.floor;
     document.getElementById('mAddress').textContent = shop.address;
-    document.getElementById('mCategory').textContent = shop.category;
 
     document.getElementById('shopModal').style.display = 'flex';
   }
