@@ -6,7 +6,9 @@
   <title>মার্চেন্ট ও দোকান ডাটাবেজ ড্যাশবোর্ড</title>
   <!-- Excel Reader Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- PDF Generator Libraries -->
+  <!-- PDF Reader Library (PDF.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <!-- PDF Export Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
@@ -45,10 +47,10 @@
 <div class="container">
   <h2>মার্চেন্ট ও দোকান ডাটাবেজ ড্যাশবোর্ড</h2>
   
-  <!-- ফাইল আপলোড অংশ -->
+  <!-- ফাইল আপলোড অংশ (PDF এবং Excel উভয়ের জন্য) -->
   <div class="upload-section">
-    <label for="excelFile" class="upload-btn">📁 যেকোনো Excel (.xlsx/.xls) আপলোড করুন</label>
-    <input type="file" id="excelFile" accept=".xlsx, .xls">
+    <label for="dataFile" class="upload-btn">📁 PDF বা Excel (.pdf, .xlsx, .xls) আপলোড করুন</label>
+    <input type="file" id="dataFile" accept=".xlsx, .xls, .pdf">
     <p id="fileName" style="margin-top: 10px; font-size: 13px; color: #64748b;"></p>
   </div>
 
@@ -94,7 +96,7 @@
       </thead>
       <tbody id="tableBody">
         <tr>
-          <td colspan="6" style="text-align: center; color: #94a3b8;">অনুগ্রহ করে একটি এক্সেল ফাইল আপলোড করুন।</td>
+          <td colspan="6" style="text-align: center; color: #94a3b8;">অনুগ্রহ করে একটি PDF অথবা Excel ফাইল আপলোড করুন।</td>
         </tr>
       </tbody>
     </table>
@@ -102,29 +104,38 @@
 </div>
 
 <script>
+  // PDF.js worker সেটআপ
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
   let storeData = [];
   let currentFilteredData = [];
 
-  // এক্সেল ফাইল পড়ার ইভেন্ট
-  document.getElementById('excelFile').addEventListener('change', function(e) {
+  // ফাইল সিলেকশন হ্যান্ডলার
+  document.getElementById('dataFile').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    document.getElementById('fileName').textContent = "লোড করা হয়েছে: " + file.name;
+    document.getElementById('fileName').textContent = "লোড করা হচ্ছে: " + file.name;
 
+    if (file.name.endsWith('.pdf')) {
+      readPDFFile(file);
+    } else {
+      readExcelFile(file);
+    }
+  });
+
+  // ১. এক্সেল ফাইল রিড করার ফাংশন
+  function readExcelFile(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: 'array' });
-      
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       const rawJson = XLSX.utils.sheet_to_json(worksheet);
 
-      // ১০ম তলা পর্যন্ত অটো-ফ্লোর ডিটেকশন
       storeData = rawJson.map(row => {
         const address = strVal(row['Present Address'] || row['Address'] || row['Present_Address']);
-        
         return {
           sl: strVal(row['SL'] || row['sl']),
           floor: detectFloor(address, strVal(row['Floor'] || row['floor'])),
@@ -134,11 +145,57 @@
           category: strVal(row['Category'] || row['category'])
         };
       });
-
       filterData();
     };
     reader.readAsArrayBuffer(file);
-  });
+  }
+
+  // ২. পিডিএফ ফাইল রিড করার ফাংশন
+  function readPDFFile(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const typedarray = new Uint8Array(e.target.result);
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      let fullText = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(" ");
+        fullText += pageText + "\n";
+      }
+
+      parsePDFText(fullText);
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // পিডিএফের টেক্সট থেকে ডাটা এক্সট্র্যাক্ট করার লজিক
+  function parsePDFText(text) {
+    const lines = text.split("\n");
+    storeData = [];
+
+    // পিডিএফ টেক্সটের লাইনগুলো ধরে ফিল্টারিং
+    lines.forEach(line => {
+      const walletMatch = line.match(/\b\d{10}\b/); // ১০ ডিজিটের ওয়ালেট
+      if (walletMatch) {
+        const wallet = walletMatch[0];
+        const address = line; 
+        const floor = detectFloor(address, '');
+
+        storeData.push({
+          sl: '-',
+          floor: floor,
+          name: 'Merchant Record',
+          wallet: wallet,
+          address: address.length > 80 ? address.substring(0, 80) + '...' : address,
+          category: 'New'
+        });
+      }
+    });
+
+    filterData();
+  }
 
   function strVal(val) {
     return val ? String(val).trim() : '';
@@ -156,8 +213,8 @@
     if (addr.includes('6th')) return '6th Floor';
     if (addr.includes('5th')) return '5th Floor';
     if (addr.includes('4th')) return '4th Floor';
-    if (addr.includes('3rd') || addr.includes('level. 3')) return '3rd Floor';
-    if (addr.includes('2nd') || addr.includes('2rd')) return '2nd Floor';
+    if (addr.includes('3rd') || addr.includes('level. 3') || addr.includes('2rd')) return '3rd Floor';
+    if (addr.includes('2nd')) return '2nd Floor';
     if (addr.includes('1st')) return '1st Floor';
     if (addr.includes('besment') || addr.includes('underground') || addr.includes('basement') || addr.includes('ander ground')) return 'Basement';
     
@@ -208,18 +265,18 @@
     });
   }
 
-  // পিডিএফ সেভ করার ফাংশন
+  // পিডিএফ এক্সপোর্ট করার ফাংশন
   function exportPDF() {
     if (currentFilteredData.length === 0) {
-      alert("পিডিএফ ডাউনলোড করার জন্য আগে একটি এক্সেল ফাইল আপলোড করুন!");
+      alert("পিডিএফ ডাউনলোড করার জন্য আগে একটি ফাইল আপলোড করুন!");
       return;
     }
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('l', 'mm', 'a4'); // LandScape Format
+    const doc = new jsPDF('l', 'mm', 'a4');
 
     doc.setFontSize(16);
-    doc.text("Merchant & Shop Database", 14, 15);
+    doc.text("Merchant & Shop Database Report", 14, 15);
 
     const tableRows = currentFilteredData.map(item => [
       item.sl,
