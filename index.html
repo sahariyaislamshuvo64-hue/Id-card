@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>মার্চেন্ট ও দোকান ডাটাবেজ</title>
+  <title>মার্চেন্ট ও দোকান ডাটাবেজ ড্যাশবোর্ড</title>
+  <!-- Excel Reader Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- PDF Generator Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     body { background-color: #f4f7f6; color: #333; padding: 20px; }
@@ -15,8 +19,11 @@
     .upload-section input { display: none; }
     .upload-btn { background: #0284c7; color: #fff; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
     .upload-btn:hover { background: #0369a1; }
+
+    .pdf-btn { background: #dc2626; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+    .pdf-btn:hover { background: #b91c1c; }
     
-    .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+    .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
     .controls select, .controls input { flex: 1; min-width: 200px; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
     
     .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -45,7 +52,7 @@
     <p id="fileName" style="margin-top: 10px; font-size: 13px; color: #64748b;"></p>
   </div>
 
-  <!-- ফিল্টার ও সার্চ বারের সুবিধা -->
+  <!-- ফিল্টার, সার্চ ও পিডিএফ বাটন -->
   <div class="controls">
     <select id="floorFilter">
       <option value="all">সব ফ্লোর (All Floors)</option>
@@ -54,19 +61,27 @@
       <option value="1st Floor">1st Floor</option>
       <option value="2nd Floor">2nd Floor</option>
       <option value="3rd Floor">3rd Floor</option>
+      <option value="4th Floor">4th Floor</option>
+      <option value="5th Floor">5th Floor</option>
+      <option value="6th Floor">6th Floor</option>
+      <option value="7th Floor">7th Floor</option>
+      <option value="8th Floor">8th Floor</option>
+      <option value="9th Floor">9th Floor</option>
+      <option value="10th Floor">10th Floor</option>
     </select>
     <input type="text" id="searchInput" placeholder="দোকানের নাম, ওয়ালেট বা ঠিকানা দিয়ে সার্চ করুন...">
+    <button class="pdf-btn" onclick="exportPDF()">📄 PDF সেভ করুন</button>
   </div>
 
-  <!-- সামারি/পরিসংখ্যান -->
+  <!-- কাউন্টার -->
   <div class="stats">
     <div class="stat-card">মোট দোকান: <span id="totalStores">0</span> টি</div>
-    <div class="stat-card">বর্তমান ফ্লোরে দোকান: <span id="filteredStores">0</span> টি</div>
+    <div class="stat-card">বর্তমান ফিল্টারে দোকান: <span id="filteredStores">0</span> টি</div>
   </div>
 
-  <!-- টেবিল প্রদর্শন -->
+  <!-- ডাটা টেবিল -->
   <div style="overflow-x: auto;">
-    <table>
+    <table id="storeTable">
       <thead>
         <tr>
           <th>SL</th>
@@ -88,8 +103,9 @@
 
 <script>
   let storeData = [];
+  let currentFilteredData = [];
 
-  // এক্সেল ফাইল রিড করার ইভেন্ট
+  // এক্সেল ফাইল পড়ার ইভেন্ট
   document.getElementById('excelFile').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -101,12 +117,11 @@
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: 'array' });
       
-      // প্রথম শিটের ডাটা রূপান্তর
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       const rawJson = XLSX.utils.sheet_to_json(worksheet);
 
-      // ডাটা প্রসেস এবং অটো-ফ্লোর ডিটেকশন
+      // ১০ম তলা পর্যন্ত অটো-ফ্লোর ডিটেকশন
       storeData = rawJson.map(row => {
         const address = strVal(row['Present Address'] || row['Address'] || row['Present_Address']);
         
@@ -120,28 +135,35 @@
         };
       });
 
-      renderTable(storeData);
+      filterData();
     };
     reader.readAsArrayBuffer(file);
   });
 
-  // স্ট্রিং কনভার্ট সহায়তা
   function strVal(val) {
     return val ? String(val).trim() : '';
   }
 
-  // ঠিকানার কিওয়ার্ড দেখে ফ্লোর ডিটেক্ট করার লজিক
+  // ১ থেকে ১০ম ফ্লোর এবং বেইজমেন্ট ডিটেক্ট করার লজিক
   function detectFloor(address, explicitFloor) {
     if (explicitFloor) return explicitFloor;
     const addr = address.toLowerCase();
-    if (addr.includes('2nd') || addr.includes('2rd')) return '2nd Floor';
+
+    if (addr.includes('10th')) return '10th Floor';
+    if (addr.includes('9th')) return '9th Floor';
+    if (addr.includes('8th')) return '8th Floor';
+    if (addr.includes('7th')) return '7th Floor';
+    if (addr.includes('6th')) return '6th Floor';
+    if (addr.includes('5th')) return '5th Floor';
+    if (addr.includes('4th')) return '4th Floor';
     if (addr.includes('3rd') || addr.includes('level. 3')) return '3rd Floor';
+    if (addr.includes('2nd') || addr.includes('2rd')) return '2nd Floor';
     if (addr.includes('1st')) return '1st Floor';
     if (addr.includes('besment') || addr.includes('underground') || addr.includes('basement') || addr.includes('ander ground')) return 'Basement';
+    
     return 'Ground Floor';
   }
 
-  // ফিল্টার ও সার্চ সিস্টেম
   document.getElementById('floorFilter').addEventListener('change', filterData);
   document.getElementById('searchInput').addEventListener('input', filterData);
 
@@ -149,7 +171,7 @@
     const selectedFloor = document.getElementById('floorFilter').value;
     const searchText = document.getElementById('searchInput').value.toLowerCase();
 
-    const filtered = storeData.filter(item => {
+    currentFilteredData = storeData.filter(item => {
       const matchesFloor = selectedFloor === 'all' || item.floor === selectedFloor;
       const matchesSearch = item.name.toLowerCase().includes(searchText) || 
                             item.wallet.toLowerCase().includes(searchText) || 
@@ -157,10 +179,9 @@
       return matchesFloor && matchesSearch;
     });
 
-    renderTable(filtered);
+    renderTable(currentFilteredData);
   }
 
-  // টেবিল রেন্ডারিং
   function renderTable(data) {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
@@ -185,6 +206,40 @@
       `;
       tbody.appendChild(tr);
     });
+  }
+
+  // পিডিএফ সেভ করার ফাংশন
+  function exportPDF() {
+    if (currentFilteredData.length === 0) {
+      alert("পিডিএফ ডাউনলোড করার জন্য আগে একটি এক্সেল ফাইল আপলোড করুন!");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); // LandScape Format
+
+    doc.setFontSize(16);
+    doc.text("Merchant & Shop Database", 14, 15);
+
+    const tableRows = currentFilteredData.map(item => [
+      item.sl,
+      item.floor,
+      item.name,
+      item.wallet,
+      item.address,
+      item.category
+    ]);
+
+    doc.autoTable({
+      head: [['SL', 'Floor', 'Merchant Name', 'Wallet No', 'Address', 'Category']],
+      body: tableRows,
+      startY: 22,
+      theme: 'grid',
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [2, 132, 199] }
+    });
+
+    doc.save('Shop_Database.pdf');
   }
 </script>
 
