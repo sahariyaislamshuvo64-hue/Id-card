@@ -3,300 +3,257 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>মার্চেন্ট ও দোকান ডাটাবেজ ড্যাশবোর্ড</title>
-  <!-- Excel Reader Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- PDF Reader Library (PDF.js) -->
+  <title>মার্চেন্ট ও শপ ট্র্যাকার ড্যাশবোর্ড</title>
+  <!-- PDF.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <!-- PDF Export Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f4f7f6; color: #333; padding: 20px; }
-    .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    h2 { margin-bottom: 20px; color: #1e293b; text-align: center; }
+    body { background-color: #f1f5f9; color: #1e293b; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
     
-    .upload-section { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #0284c7; padding: 25px; border-radius: 8px; background: #f0f9ff; margin-bottom: 25px; }
-    .upload-section input { display: none; }
-    .upload-btn { background: #0284c7; color: #fff; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    h2 { text-align: center; margin-bottom: 20px; color: #0f172a; }
+    
+    /* Upload Box */
+    .upload-card { background: #fff; padding: 25px; border-radius: 12px; border: 2px dashed #0284c7; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .upload-card input { display: none; }
+    .upload-btn { background: #0284c7; color: white; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; display: inline-block; transition: 0.3s; }
     .upload-btn:hover { background: #0369a1; }
 
-    .pdf-btn { background: #dc2626; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    .pdf-btn:hover { background: #b91c1c; }
+    /* Floor Summary Cards Grid */
+    .floor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .floor-card { background: #fff; padding: 15px; border-radius: 10px; border-left: 5px solid #0284c7; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .floor-card:hover, .floor-card.active { background: #e0f2fe; border-left-color: #0369a1; transform: translateY(-2px); }
+    .floor-card h4 { font-size: 15px; color: #334155; }
+    .floor-card p { font-size: 20px; font-weight: bold; color: #0284c7; margin-top: 5px; }
+
+    /* Search & Table Controls */
+    .table-container { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .search-box { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
     
-    .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-    .controls select, .controls input { flex: 1; min-width: 200px; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-    
-    .stats { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 20px; border-radius: 6px; font-weight: 600; color: #475569; }
-    .stat-card span { color: #0284c7; font-weight: bold; }
-    
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { text-align: left; padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-    th { background-color: #f1f5f9; color: #334155; font-weight: bold; }
-    tr:hover { background-color: #f8fafc; }
-    
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    .badge-floor { background: #e0f2fe; color: #0369a1; }
-    .badge-cat { background: #fef3c7; color: #b45309; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    th { background: #f8fafc; color: #475569; }
+    tr.shop-row { cursor: pointer; transition: 0.2s; }
+    tr.shop-row:hover { background: #f1f5f9; }
+
+    /* Modal / Pop-up for Shop Details */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .close-btn { position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; font-weight: bold; color: #64748b; }
+    .detail-item { margin-bottom: 12px; }
+    .detail-item label { font-size: 12px; color: #64748b; display: block; font-weight: bold; }
+    .detail-item span { font-size: 15px; color: #0f172a; font-weight: 600; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>মার্চেন্ট ও দোকান ডাটাবেজ ড্যাশবোর্ড</h2>
-  
-  <!-- ফাইল আপলোড অংশ (PDF এবং Excel উভয়ের জন্য) -->
-  <div class="upload-section">
-    <label for="dataFile" class="upload-btn">📁 PDF বা Excel (.pdf, .xlsx, .xls) আপলোড করুন</label>
-    <input type="file" id="dataFile" accept=".xlsx, .xls, .pdf">
+  <h2>মার্চেন্ট ও শপ অটো-ট্র্যাকার ড্যাশবোর্ড</h2>
+
+  <!-- Upload Area -->
+  <div class="upload-card">
+    <label for="pdfFile" class="upload-btn">📁 PDF ফাইল আপলোড করুন</label>
+    <input type="file" id="pdfFile" accept=".pdf">
     <p id="fileName" style="margin-top: 10px; font-size: 13px; color: #64748b;"></p>
   </div>
 
-  <!-- ফিল্টার, সার্চ ও পিডিএফ বাটন -->
-  <div class="controls">
-    <select id="floorFilter">
-      <option value="all">সব ফ্লোর (All Floors)</option>
-      <option value="Basement">Basement / Underground</option>
-      <option value="Ground Floor">Ground Floor / Nich Tola</option>
-      <option value="1st Floor">1st Floor</option>
-      <option value="2nd Floor">2nd Floor</option>
-      <option value="3rd Floor">3rd Floor</option>
-      <option value="4th Floor">4th Floor</option>
-      <option value="5th Floor">5th Floor</option>
-      <option value="6th Floor">6th Floor</option>
-      <option value="7th Floor">7th Floor</option>
-      <option value="8th Floor">8th Floor</option>
-      <option value="9th Floor">9th Floor</option>
-      <option value="10th Floor">10th Floor</option>
-    </select>
-    <input type="text" id="searchInput" placeholder="দোকানের নাম, ওয়ালেট বা ঠিকানা দিয়ে সার্চ করুন...">
-    <button class="pdf-btn" onclick="exportPDF()">📄 PDF সেভ করুন</button>
+  <!-- Floor Summaries (ফ্লোর অনুযায়ী কতটি দোকান) -->
+  <div class="floor-grid" id="floorSummary">
+    <!-- Dynamic Floor Cards Will Appear Here -->
   </div>
 
-  <!-- কাউন্টার -->
-  <div class="stats">
-    <div class="stat-card">মোট দোকান: <span id="totalStores">0</span> টি</div>
-    <div class="stat-card">বর্তমান ফিল্টারে দোকান: <span id="filteredStores">0</span> টি</div>
+  <!-- Data Table -->
+  <div class="table-container">
+    <input type="text" id="searchInput" class="search-box" placeholder="দোকানের নাম, ওয়ালেট বা নম্বর দিয়ে ফিল্টার করুন...">
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>SL</th>
+            <th>মার্চেন্টের নাম / শপ</th>
+            <th>মার্চেন্ট ওয়ালেট নম্বর</th>
+            <th>ফ্লোর</th>
+            <th>অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="5" style="text-align: center; color: #94a3b8;">PDF ফাইল আপলোড করলে ডাটা লোড হবে।</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+</div>
 
-  <!-- ডাটা টেবিল -->
-  <div style="overflow-x: auto;">
-    <table id="storeTable">
-      <thead>
-        <tr>
-          <th>SL</th>
-          <th>ফ্লোর</th>
-          <th>দোকান / মার্চেন্টের নাম</th>
-          <th>ওয়ালেট নম্বর</th>
-          <th>ঠিকানা</th>
-          <th>ক্যাটাগরি</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr>
-          <td colspan="6" style="text-align: center; color: #94a3b8;">অনুগ্রহ করে একটি PDF অথবা Excel ফাইল আপলোড করুন।</td>
-        </tr>
-      </tbody>
-    </table>
+<!-- Modal Pop-up (দোকানের বিস্তারিত ডিটেইলস দেখানোর জন্য) -->
+<div class="modal" id="shopModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3 style="margin-bottom: 15px; color: #0284c7;">দোকানের পূর্ণাঙ্গ বিবরণ</h3>
+    
+    <div class="detail-item"><label>সিরিয়াল নম্বর (SL):</label><span id="mSL">-</span></div>
+    <div class="detail-item"><label>মার্চেন্ট / দোকানের নাম:</label><span id="mName">-</span></div>
+    <div class="detail-item"><label>মার্চেন্ট ওয়ালেট নম্বর:</label><span id="mWallet">-</span></div>
+    <div class="detail-item"><label>অবস্থান / ফ্লোর:</label><span id="mFloor">-</span></div>
+    <div class="detail-item"><label>সম্পূর্ণ ঠিকানা:</label><span id="mAddress">-</span></div>
+    <div class="detail-item"><label>ক্যাটাগরি:</label><span id="mCategory">-</span></div>
   </div>
 </div>
 
 <script>
-  // PDF.js worker সেটআপ
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-  let storeData = [];
-  let currentFilteredData = [];
+  let allShops = [];
+  let selectedFloorFilter = 'ALL';
 
-  // ফাইল সিলেকশন হ্যান্ডলার
-  document.getElementById('dataFile').addEventListener('change', function(e) {
+  document.getElementById('pdfFile').addEventListener('change', async function(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    document.getElementById('fileName').textContent = "লোড করা হচ্ছে: " + file.name;
+    document.getElementById('fileName').textContent = "প্রসেস হচ্ছে: " + file.name;
 
-    if (file.name.endsWith('.pdf')) {
-      readPDFFile(file);
-    } else {
-      readExcelFile(file);
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+
+    let fullTextBlocks = [];
+
+    // পিডিএফ এর সব পেজ পড়ে তথ্য নেওয়া
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageStrings = textContent.items.map(item => item.str);
+      fullTextBlocks.push(...pageStrings);
     }
+
+    parsePdfData(fullTextBlocks);
   });
 
-  // ১. এক্সেল ফাইল রিড করার ফাংশন
-  function readExcelFile(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      const rawJson = XLSX.utils.sheet_to_json(worksheet);
-
-      storeData = rawJson.map(row => {
-        const address = strVal(row['Present Address'] || row['Address'] || row['Present_Address']);
-        return {
-          sl: strVal(row['SL'] || row['sl']),
-          floor: detectFloor(address, strVal(row['Floor'] || row['floor'])),
-          name: strVal(row['Merchant Name'] || row['Merchant_Name'] || row['Name'] || row['name']),
-          wallet: strVal(row['Wallet No'] || row['Wallet'] || row['wallet']),
-          address: address,
-          category: strVal(row['Category'] || row['category'])
-        };
-      });
-      filterData();
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  // ২. পিডিএফ ফাইল রিড করার ফাংশন
-  function readPDFFile(file) {
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const typedarray = new Uint8Array(e.target.result);
-      const pdf = await pdfjsLib.getDocument(typedarray).promise;
-      let fullText = "";
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(" ");
-        fullText += pageText + "\n";
-      }
-
-      parsePDFText(fullText);
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  // পিডিএফের টেক্সট থেকে ডাটা এক্সট্র্যাক্ট করার লজিক
-  function parsePDFText(text) {
-    const lines = text.split("\n");
-    storeData = [];
-
-    // পিডিএফ টেক্সটের লাইনগুলো ধরে ফিল্টারিং
-    lines.forEach(line => {
-      const walletMatch = line.match(/\b\d{10}\b/); // ১০ ডিজিটের ওয়ালেট
-      if (walletMatch) {
-        const wallet = walletMatch[0];
-        const address = line; 
-        const floor = detectFloor(address, '');
-
-        storeData.push({
-          sl: '-',
-          floor: floor,
-          name: 'Merchant Record',
-          wallet: wallet,
-          address: address.length > 80 ? address.substring(0, 80) + '...' : address,
-          category: 'New'
-        });
-      }
-    });
-
-    filterData();
-  }
-
-  function strVal(val) {
-    return val ? String(val).trim() : '';
-  }
-
-  // ১ থেকে ১০ম ফ্লোর এবং বেইজমেন্ট ডিটেক্ট করার লজিক
-  function detectFloor(address, explicitFloor) {
-    if (explicitFloor) return explicitFloor;
-    const addr = address.toLowerCase();
-
-    if (addr.includes('10th')) return '10th Floor';
-    if (addr.includes('9th')) return '9th Floor';
-    if (addr.includes('8th')) return '8th Floor';
-    if (addr.includes('7th')) return '7th Floor';
-    if (addr.includes('6th')) return '6th Floor';
-    if (addr.includes('5th')) return '5th Floor';
-    if (addr.includes('4th')) return '4th Floor';
-    if (addr.includes('3rd') || addr.includes('level. 3') || addr.includes('2rd')) return '3rd Floor';
-    if (addr.includes('2nd')) return '2nd Floor';
-    if (addr.includes('1st')) return '1st Floor';
-    if (addr.includes('besment') || addr.includes('underground') || addr.includes('basement') || addr.includes('ander ground')) return 'Basement';
+  // পিডিএফের ডাটা প্রসেস ও ফিল্টারিং লজিক
+  function parsePdfData(blocks) {
+    allShops = [];
+    let text = blocks.join(" ");
     
-    return 'Ground Floor';
+    // ১১ ডিজিটের ওয়ালেট নম্বর দিয়ে আলাদা করে ডাটা এক্সট্র্যাক্ট করা
+    const pattern = /(2\d{5}|\d{5,6})\s*\|\s*Savar\s*\|\s*(\d{10,11})[\s\S]*?(?=2\d{5}|\d{5,6}\s*\|\s*Savar|$)/gi;
+    let match;
+
+    let count = 1;
+    while ((match = pattern.exec(text)) !== null) {
+      let block = match[0];
+      
+      let slMatch = block.match(/^(2\d{5}|\d{5,6})/);
+      let walletMatch = block.match(/\b(1\d{9})\b/);
+      
+      // ফ্লোর সনাক্তকরণ
+      let floor = "Ground Floor";
+      if (/3rd|level\. 3/i.test(block)) floor = "3rd Floor";
+      else if (/2nd|2rd/i.test(block)) floor = "2nd Floor";
+      else if (/1st/i.test(block)) floor = "1st Floor";
+      else if (/besment|underground|basement/i.test(block)) floor = "Basement";
+
+      // মার্চেন্টের নাম ও এড্রেস টেক্সট ক্লিন করা
+      let cleanText = block.replace(/\|/g, " ").replace(/\s+/g, " ");
+
+      allShops.push({
+        sl: slMatch ? slMatch[0] : count++,
+        wallet: walletMatch ? walletMatch[0] : "N/A",
+        floor: floor,
+        name: extractMerchantName(cleanText),
+        address: cleanText,
+        category: /Super Active/i.test(block) ? "Super Active" : (/Moderate/i.test(block) ? "Moderate" : "New")
+      });
+    }
+
+    renderSummaryCards();
+    renderTable();
   }
 
-  document.getElementById('floorFilter').addEventListener('change', filterData);
-  document.getElementById('searchInput').addEventListener('input', filterData);
+  function extractMerchantName(text) {
+    let knownNames = text.match(/(AL ARAF ORNA HOUSE|Ayush Panjabi|Time Pass|Sajal Jewellers|FRENZY|BHUIYAN LEATHER|OUTFIT|yummy tasty|Gifts Zone|PRINTER SERVICE|MIM EXPORT HOUSE)/i);
+    return knownNames ? knownNames[0] : "Merchant Shop";
+  }
 
-  function filterData() {
-    const selectedFloor = document.getElementById('floorFilter').value;
-    const searchText = document.getElementById('searchInput').value.toLowerCase();
+  // ফ্লোর ভিত্তিক সামারি তৈরি (কোন ফ্লোরে কয়টি দোকান)
+  function renderSummaryCards() {
+    const counts = { "ALL": allShops.length, "Basement": 0, "Ground Floor": 0, "1st Floor": 0, "2nd Floor": 0, "3rd Floor": 0 };
 
-    currentFilteredData = storeData.filter(item => {
-      const matchesFloor = selectedFloor === 'all' || item.floor === selectedFloor;
-      const matchesSearch = item.name.toLowerCase().includes(searchText) || 
-                            item.wallet.toLowerCase().includes(searchText) || 
-                            item.address.toLowerCase().includes(searchText);
-      return matchesFloor && matchesSearch;
+    allShops.forEach(shop => {
+      if (counts[shop.floor] !== undefined) counts[shop.floor]++;
+      else counts[shop.floor] = 1;
     });
 
-    renderTable(currentFilteredData);
+    const summaryContainer = document.getElementById('floorSummary');
+    summaryContainer.innerHTML = '';
+
+    Object.keys(counts).forEach(floor => {
+      const card = document.createElement('div');
+      card.className = `floor-card ${selectedFloorFilter === floor ? 'active' : ''}`;
+      card.onclick = () => filterByFloor(floor);
+      card.innerHTML = `
+        <h4>${floor === 'ALL' ? 'মোট সব দোকান' : floor}</h4>
+        <p>${counts[floor]} টি</p>
+      `;
+      summaryContainer.appendChild(card);
+    });
   }
 
-  function renderTable(data) {
+  function filterByFloor(floor) {
+    selectedFloorFilter = floor;
+    renderSummaryCards();
+    renderTable();
+  }
+
+  // টেবিল রেন্ডারিং
+  function renderTable() {
     const tbody = document.getElementById('tableBody');
+    const searchVal = document.getElementById('searchInput').value.toLowerCase();
     tbody.innerHTML = '';
 
-    document.getElementById('totalStores').textContent = storeData.length;
-    document.getElementById('filteredStores').textContent = data.length;
+    const filtered = allShops.filter(shop => {
+      const matchFloor = selectedFloorFilter === 'ALL' || shop.floor === selectedFloorFilter;
+      const matchSearch = shop.name.toLowerCase().includes(searchVal) || 
+                          shop.wallet.includes(searchVal) || 
+                          shop.address.toLowerCase().includes(searchVal);
+      return matchFloor && matchSearch;
+    });
 
-    if (data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8;">কোনো ডাটা পাওয়া যায়নি।</td></tr>`;
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">কোনো দোকান পাওয়া যায়নি।</td></tr>`;
       return;
     }
 
-    data.forEach(item => {
+    filtered.forEach(shop => {
       const tr = document.createElement('tr');
+      tr.className = 'shop-row';
+      tr.onclick = () => openModal(shop); // দোকানে ক্লিক করলে পপ-আপ ওপেন হবে
       tr.innerHTML = `
-        <td>${item.sl || '-'}</td>
-        <td><span class="badge badge-floor">${item.floor}</span></td>
-        <td><strong>${item.name || 'নাম নেই'}</strong></td>
-        <td>${item.wallet || '-'}</td>
-        <td>${item.address || '-'}</td>
-        <td><span class="badge badge-cat">${item.category || 'N/A'}</span></td>
+        <td>${shop.sl}</td>
+        <td><strong>${shop.name}</strong></td>
+        <td>${shop.wallet}</td>
+        <td><span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${shop.floor}</span></td>
+        <td><button style="background:#0284c7; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">বিস্তারিত দেখুন</button></td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  // পিডিএফ এক্সপোর্ট করার ফাংশন
-  function exportPDF() {
-    if (currentFilteredData.length === 0) {
-      alert("পিডিএফ ডাউনলোড করার জন্য আগে একটি ফাইল আপলোড করুন!");
-      return;
-    }
+  document.getElementById('searchInput').addEventListener('input', renderTable);
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('l', 'mm', 'a4');
+  // পপ-আপ মডাল সার্ভিস (দোকানের সম্পূর্ণ ডিটেইলস)
+  function openModal(shop) {
+    document.getElementById('mSL').textContent = shop.sl;
+    document.getElementById('mName').textContent = shop.name;
+    document.getElementById('mWallet').textContent = shop.wallet;
+    document.getElementById('mFloor').textContent = shop.floor;
+    document.getElementById('mAddress').textContent = shop.address;
+    document.getElementById('mCategory').textContent = shop.category;
 
-    doc.setFontSize(16);
-    doc.text("Merchant & Shop Database Report", 14, 15);
+    document.getElementById('shopModal').style.display = 'flex';
+  }
 
-    const tableRows = currentFilteredData.map(item => [
-      item.sl,
-      item.floor,
-      item.name,
-      item.wallet,
-      item.address,
-      item.category
-    ]);
-
-    doc.autoTable({
-      head: [['SL', 'Floor', 'Merchant Name', 'Wallet No', 'Address', 'Category']],
-      body: tableRows,
-      startY: 22,
-      theme: 'grid',
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [2, 132, 199] }
-    });
-
-    doc.save('Shop_Database.pdf');
+  function closeModal() {
+    document.getElementById('shopModal').style.display = 'none';
   }
 </script>
 
