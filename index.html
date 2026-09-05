@@ -1,557 +1,104 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unique Dynamic ID Card Generator - Insight Metrics</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    body { background: #cfd8dc; padding: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+import pandas as pd
 
-    /* SIDEBAR FORM CONTROLS */
-    .form-container {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      width: 350px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .form-container h2 { font-size: 16px; margin-bottom: 15px; color: #00796b; border-bottom: 2px solid #00a651; padding-bottom: 5px; }
-    
-    .select-card-qty {
-      background: #e8f5e9;
-      border: 1.5px solid #00a651;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-    .select-card-qty label { font-size: 13px; font-weight: bold; color: #00695c; display: block; margin-bottom: 6px; }
-    .select-card-qty select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #b2dfdb; font-weight: bold; outline: none; }
+# PDF থেকে সংগৃহীত ডেটাসেট
+data = [
+    # Underground / Basement Floor
+    {"Floor": "Underground/Basement", "Name": "Sajid Export Zone", "Wallet": "1714406608", "Address": "under ground, shop no-3c"},
+    {"Floor": "Underground/Basement", "Name": "T.S.S COLLECTION", "Wallet": "1739677329", "Address": "Shop no 45,46 Basement 1"},
+    {"Floor": "Underground/Basement", "Name": "MS Fashion", "Wallet": "1911164958", "Address": "Shop number 68, basement floor"},
+    {"Floor": "Underground/Basement", "Name": "Afifa Cuting To Fiting", "Wallet": "1967148963", "Address": "H-94, Ander Ground"},
+    {"Floor": "Underground/Basement", "Name": "Export Zone-2", "Wallet": "1327265551", "Address": "besment floor, Shop number 96"},
+    {"Floor": "Underground/Basement", "Name": "MA FASHION", "Wallet": "1312612351", "Address": "Shop No 17, Basement-1"},
+    {"Floor": "Underground/Basement", "Name": "Maima Enterprise", "Wallet": "1828242712", "Address": "Shop no 109, Basement 1"},
+    {"Floor": "Underground/Basement", "Name": "Stand Blue", "Wallet": "1720610351", "Address": "Shop-129, Underground"},
+    {"Floor": "Underground/Basement", "Name": "APPARELS 365", "Wallet": "1712124127", "Address": "besment Floor, Shop Number 92"},
+    {"Floor": "Underground/Basement", "Name": "OUTFITS ZONE", "Wallet": "1631686015", "Address": "ground floor shop 03 e basement"},
+    {"Floor": "Underground/Basement", "Name": "TOP APPAREL", "Wallet": "1620593033", "Address": "UNDER GROUND FLOOR, DOKAN NO-13"},
+    {"Floor": "Underground/Basement", "Name": "Global Connect Tour and Travels", "Wallet": "1630888003", "Address": "Underground Shop No 6"},
+    {"Floor": "Underground/Basement", "Name": "SHAHEEN Export ware", "Wallet": "1764066488", "Address": "Shop Number 67, Basement floor"},
 
-    .member-block {
-      background: #f9f9f9;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-    .member-block h3 { font-size: 13px; color: #008d44; margin-bottom: 8px; border-bottom: 1px dashed #cccccc; padding-bottom: 4px; }
-    
-    .input-group { margin-bottom: 8px; }
-    .input-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 3px; color: #444; }
-    .input-group input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+    # Ground Floor / Nich Tola
+    {"Floor": "Ground Floor", "Name": "Shopno Purno Cosmetics", "Wallet": "1722072963", "Address": "03, S-28, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "Gifts Zone", "Wallet": "1853275440", "Address": "Shop no 135 A, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "Innovative Computer And Technologies", "Wallet": "1867806010", "Address": "Shop-49, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "Rosni Porda Gallery And Boutiques", "Wallet": "1701623531", "Address": "129, 132, 133, Nich Tola"},
+    {"Floor": "Ground Floor", "Name": "Yash Fashion", "Wallet": "1607632387", "Address": "shop number 63, ground floor"},
+    {"Floor": "Ground Floor", "Name": "FALAK COSMETICS", "Wallet": "1794538584", "Address": "Shop No 25"},
+    {"Floor": "Ground Floor", "Name": "FRENZY LEATHER & SPORTS", "Wallet": "1891147614", "Address": "Ground floor, Shop 146,147"},
+    {"Floor": "Ground Floor", "Name": "LIANA BEAUTY SPOT", "Wallet": "1773551589", "Address": "shop-139, ground floor"},
+    {"Floor": "Ground Floor", "Name": "MIM EXPORT HOUSE", "Wallet": "1720601752", "Address": "shop no -84/A, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "Micronet Computers", "Wallet": "1727162026", "Address": "Ground floor, Shop number 71"},
+    {"Floor": "Ground Floor", "Name": "PRINTER SERVICE SYSTEM", "Wallet": "1973341127", "Address": "Shop No-84/C, Ground floor"},
+    {"Floor": "Ground Floor", "Name": "Pixel Computer & Network", "Wallet": "1772686808", "Address": "Ground floor, Shop Number 69"},
+    {"Floor": "Ground Floor", "Name": "Time Point", "Wallet": "1968751403", "Address": "Graund floor DOKAN No-156"},
+    {"Floor": "Ground Floor", "Name": "ASIAN IT", "Wallet": "1719526069", "Address": "Shop-31 ground floor"},
+    {"Floor": "Ground Floor", "Name": "FRENZY", "Wallet": "1970943756", "Address": "Group floor, Shop number 146-147"},
+    {"Floor": "Ground Floor", "Name": "TECH FLOW", "Wallet": "1729954359", "Address": "shop-84/F, Grand floor"},
+    {"Floor": "Ground Floor", "Name": "BHUIYAN LEATHER", "Wallet": "1673370508", "Address": "shop no 148, ground floor"},
+    {"Floor": "Ground Floor", "Name": "Shopno Purno", "Wallet": "1810508861", "Address": "Shop no-28, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "SPORTS ZONE", "Wallet": "1992282743", "Address": "ground floor shop 146/147"},
+    {"Floor": "Ground Floor", "Name": "Opsora I T", "Wallet": "1717066899", "Address": "New Market Nistala"},
+    {"Floor": "Ground Floor", "Name": "Silver Fashion", "Wallet": "1631435670", "Address": "SHOP-38, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "Ango Shaj", "Wallet": "1810899563", "Address": "Ground floor, Shop number 59"},
+    {"Floor": "Ground Floor", "Name": "AYAN WATCH", "Wallet": "1850008051", "Address": "Shop No-125, Ground floor"},
+    {"Floor": "Ground Floor", "Name": "Rafia Fashion Maker", "Wallet": "1922237726", "Address": "58, Ground Floor"},
+    {"Floor": "Ground Floor", "Name": "Innoverse Technology", "Wallet": "1773195085", "Address": "ground floor, Shop Number 70"},
+    {"Floor": "Ground Floor", "Name": "RAIYAN COSMETICS", "Wallet": "1723868780", "Address": "Shop No 24, Grund Floor"},
+    {"Floor": "Ground Floor", "Name": "TOYLAND", "Wallet": "1772096626", "Address": "NEW MARKET, GROUND FLOOR SHOP NO 135/A"},
+    {"Floor": "Ground Floor", "Name": "Frendes Fastfood", "Wallet": "1888013240", "Address": "Nichtola Savar Newmarket"},
+    {"Floor": "Ground Floor", "Name": "Watch World", "Wallet": "1985120169", "Address": "S-23, Nich Tala"},
 
-    .btn-download {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #00a651 0%, #00695c 100%);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0,166,81,0.3);
-      transition: all 0.2s ease;
-    }
-    .btn-download:hover { opacity: 0.95; transform: translateY(-1px); }
+    # 1st Floor
+    {"Floor": "1st Floor", "Name": "Mehedi Shoes", "Wallet": "1787936554", "Address": "Dokan-224, 1St Floor"},
+    {"Floor": "1st Floor", "Name": "Top Baby Shop", "Wallet": "1906838800", "Address": "54, Ist Floor"},
+    {"Floor": "1st Floor", "Name": "Payel Fashion", "Wallet": "1798759220", "Address": "Shop-70/71, 1st floor"},
+    {"Floor": "1st Floor", "Name": "Haque Borka Bazar", "Wallet": "1978264014", "Address": "lift er 1st floor, Shop number 197"},
+    {"Floor": "1st Floor", "Name": "Irani Borka Bazar", "Wallet": "1620144477", "Address": "Shop-204/a, 1st floor"},
+    {"Floor": "1st Floor", "Name": "Moon Tailors", "Wallet": "1818470558", "Address": "First Floor Newmarket"},
 
-    /* PREVIEW CONTAINER */
-    .preview-container {
-      background: #37474f;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+    # 2nd Floor
+    {"Floor": "2nd Floor", "Name": "Ayush Panjabi", "Wallet": "1728492372", "Address": "2nd floor, Shop Number 58"},
+    {"Floor": "2nd Floor", "Name": "AL ARAF ORNA HOUSE", "Wallet": "1710345436", "Address": "Shop No, 159, 160, 161, 2rd Floor"},
+    {"Floor": "2nd Floor", "Name": "Sajal Jewellers", "Wallet": "1789334155", "Address": "2nd floor, Shop number 257"},
+    {"Floor": "2nd Floor", "Name": "Al-Samir Exclusive Point", "Wallet": "1575615970", "Address": "2nd floor, Shop Number 69"},
+    {"Floor": "2nd Floor", "Name": "Orni shoes", "Wallet": "1938379145", "Address": "shop no-221, 2 nd floor"},
+    {"Floor": "2nd Floor", "Name": "OUTFIT", "Wallet": "1961362321", "Address": "Lift er 2nd, Shop number 19"},
+    {"Floor": "2nd Floor", "Name": "SARTHOK JEWELLERS", "Wallet": "1344474837", "Address": "2nd floor, Shop no-241"},
+    {"Floor": "2nd Floor", "Name": "Meli Maching Center", "Wallet": "1727779644", "Address": "178, 2Nd Floor"},
+    {"Floor": "2nd Floor", "Name": "Mita Style", "Wallet": "1822206311", "Address": "Shop-66, 2Nd Floor"},
+    {"Floor": "2nd Floor", "Name": "Anan Emitation Jewelers", "Wallet": "1670830829", "Address": "A-261 No Dokan 2Nd Floor"},
+    {"Floor": "2nd Floor", "Name": "Rafeja Tops Gallery", "Wallet": "1640726259", "Address": "2nd floor, Shop Number 152, 153"},
+    {"Floor": "2nd Floor", "Name": "New Jononi Fashion Tailors", "Wallet": "1576681800", "Address": "2nd floor, Shop Number 116"},
+    {"Floor": "2nd Floor", "Name": "ABORON PANJABI", "Wallet": "1944712935", "Address": "Shop no-112, 2nd Floor"},
+    {"Floor": "2nd Floor", "Name": "Exclusive One Jewellers", "Wallet": "1930336612", "Address": "2nd floor, Shop number 255"},
+    {"Floor": "2nd Floor", "Name": "PHONEBOOK", "Wallet": "1607043232", "Address": "2nd floor shop no 21"},
+    {"Floor": "2nd Floor", "Name": "SULTAN PANJABI-SAVAR-2", "Wallet": "1631317063", "Address": "SHOP NO-53/54, 2ND FLOOR"},
+    {"Floor": "2nd Floor", "Name": "BISHAL JEWELLERS", "Wallet": "1410008451", "Address": "Shop No. 242, 243, 2nd Floor"},
+    {"Floor": "2nd Floor", "Name": "Arabiyan Borka Gallery", "Wallet": "1950335177", "Address": "2nd floor, Shop Number 196"},
+    {"Floor": "2nd Floor", "Name": "Khokon Fashion", "Wallet": "1939576130", "Address": "Shop No-101, 2nd Floor"},
 
-    /* EXACT A4 PAGE SETUP (2 SETS PER PAGE) */
-    .pdf-page {
-      width: 210mm;
-      height: 290mm;
-      background: #ffffff !important;
-      padding: 10mm;
-      display: flex;
-      flex-direction: column;
-      gap: 12mm;
-      page-break-after: always;
-      box-sizing: border-box;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
+    # 3rd Floor
+    {"Floor": "3rd Floor", "Name": "Sotota Food Garden", "Wallet": "1603480936", "Address": "3rd floor, Shop Number F3"},
+    {"Floor": "3rd Floor", "Name": "Time pass 2", "Wallet": "1331471000", "Address": "food court, 3rd floor"},
+    {"Floor": "3rd Floor", "Name": "Time Pass", "Wallet": "1992891841", "Address": "lift er 3rd floor, Food court er ekane"},
+    {"Floor": "3rd Floor", "Name": "Fast Food Corner", "Wallet": "1648497663", "Address": "3rd floor, Food Court er vitore"},
+    {"Floor": "3rd Floor", "Name": "yummy tasty eh", "Wallet": "1326372682", "Address": "lift er 3rd floor, Food cort er vitorei"},
+    {"Floor": "3rd Floor", "Name": "Saian Telecom", "Wallet": "1799899493", "Address": "Shop No-124, 3rd floor"},
+    {"Floor": "3rd Floor", "Name": "Maestro Collection", "Wallet": "1723062362", "Address": "Level. 3, Shop no.A-1"},
+    {"Floor": "3rd Floor", "Name": "A R Telecom", "Wallet": "1614988899", "Address": "S-161-162, 3Rd Floor"},
+    {"Floor": "3rd Floor", "Name": "Jahan Electronics", "Wallet": "1787164822", "Address": "184, 3Rd Floor"},
+    {"Floor": "3rd Floor", "Name": "JAYAN TELECOM", "Wallet": "1903512169", "Address": "Shop number 116, 3rd floor"},
+    {"Floor": "3rd Floor", "Name": "SHAMPAN MOBILE ZONE", "Wallet": "1601899248", "Address": "shop no- 129/A, 3rd floor"},
+    {"Floor": "3rd Floor", "Name": "Dream Gadget 360", "Wallet": "1920202362", "Address": "Shop No 115, 3rd Floor"},
 
-    .card-pair-wrapper {
-      display: flex;
-      justify-content: center;
-      gap: 12mm;
-      height: 122mm;
-      align-items: center;
-    }
+    # 4th Floor
+    {"Floor": "4th Floor", "Name": "ROYAL EMBAER", "Wallet": "1818613771", "Address": "SHOP NO-18, 4TH FLOOR"}
+]
 
-    /* CARD CONTAINER SETUP */
-    .id-card {
-      width: 66mm;
-      height: 112mm;
-      background: #ffffff !important;
-      position: relative;
-      overflow: hidden;
-      border: 1.5px solid #00a651;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
+# DataFrame তৈরি
+df = pd.DataFrame(data)
 
-    /* HEADER GRADIENT AND LOGO STYLING */
-    .front-header {
-      background: linear-gradient(135deg, #00a651 0%, #00796b 100%) !important;
-      padding: 12px 8px 8px 8px;
-      text-align: center;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-
-    /* EXACT BRAND IM LOGO */
-    .brand-im-logo {
-      display: inline-flex;
-      align-items: flex-end;
-      height: 28px;
-      margin-bottom: 2px;
-    }
-    .brand-im-logo .dot-i-stem {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-right: 2px;
-    }
-    .brand-im-logo .i-dot {
-      width: 7px;
-      height: 7px;
-      background: #ffffff !important;
-      border-radius: 50%;
-      margin-bottom: 2px;
-    }
-    .brand-im-logo .i-stem {
-      width: 7px;
-      height: 16px;
-      background: #ffffff !important;
-      border-radius: 1px;
-    }
-    .brand-im-logo .m-text {
-      font-size: 32px;
-      font-weight: 900;
-      color: #ffffff;
-      line-height: 0.7;
-    }
-
-    .company-title {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-    }
-    .company-title .light-green { color: #80ff80; }
-    .company-title .white-txt { color: #ffffff; }
-
-    .pill-badge {
-      background: #ffffff !important;
-      color: #00796b;
-      font-size: 8px;
-      font-weight: 900;
-      padding: 3px 14px;
-      border-radius: 12px;
-      display: inline-block;
-      margin-top: 5px;
-      letter-spacing: 0.8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    /* LARGER PHOTO CONTAINER */
-    .photo-container {
-      width: 105px;
-      height: 115px;
-      border: 3.5px solid #00a651;
-      border-radius: 14px;
-      margin: 8px auto 0 auto;
-      overflow: hidden;
-      background: #f0f0f0;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.18);
-    }
-    .photo-container img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* UNIQUE NAME STYLING */
-    .name-wrapper {
-      text-align: center;
-      margin: 8px 10px 4px 10px;
-    }
-    .user-name {
-      display: inline-block;
-      background: #e8f5e9 !important;
-      color: #00695c;
-      border: 1px solid #b2dfdb;
-      font-size: 13px;
-      font-weight: 900;
-      padding: 4px 12px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* CLEAR, BOLDER & LARGER DETAILS SECTION */
-    .info-section {
-      margin: 6px 10px 8px 14px;
-      position: relative;
-      padding-left: 10px;
-    }
-    .info-section::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: #00a651 !important;
-      border-radius: 2px;
-    }
-    .info-row { display: flex; font-size: 11px; font-weight: 900; color: #000; margin-bottom: 5px; }
-    .info-label { width: 85px; color: #111; font-weight: 900; }
-    .info-val { color: #000; font-weight: 900; font-size: 11.5px; }
-
-    .bottom-bar { height: 6px; background: #00a651 !important; width: 100%; }
-
-    /* BACK SIDE DESIGN UPDATES */
-    .back-header {
-      background: linear-gradient(135deg, #00a651 0%, #00796b 100%) !important;
-      padding: 7px 8px;
-      margin: 6px 8px 4px 8px;
-      border-radius: 5px;
-      text-align: center;
-    }
-
-    .office-location-title {
-      text-align: center;
-      font-size: 9px;
-      font-weight: 900;
-      color: #00a651;
-      margin-top: 4px;
-    }
-
-    .address-card {
-      border: 1.5px solid #d0d0d0;
-      border-radius: 6px;
-      padding: 6px 8px;
-      margin: 3px 10px 0 10px;
-      text-align: center;
-      font-size: 7.8px;
-      color: #111;
-      line-height: 1.4;
-      font-weight: 700;
-      background: #fcfcfc;
-    }
-
-    .client-title {
-      text-align: center;
-      font-size: 8.5px;
-      font-weight: 900;
-      color: #00a651;
-      margin-top: 8px;
-    }
-
-    /* LARGER & CLEAN SINGLE-LINE CLIENT LOGOS */
-    .client-logos {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 0 6px;
-      margin-top: 6px;
-    }
-    .client-logos .gp { color: #00a3e0; font-size: 9.5px; font-weight: 900; }
-    .client-logos .jti { color: #00a651; font-size: 12px; font-weight: 900; font-style: italic; }
-    .akg-emblem {
-      width: 24px;
-      height: 24px;
-      background: #e30613 !important;
-      border: 1.5px solid #fecb00;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 6.5px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .client-logos .smc { border: 1px solid #1a237e; padding: 1.5px 4px; font-size: 8px; color: #1a237e; font-weight: 900; }
-
-    /* EXACT COLOR ACCURATE DOWNWARD IM LOGO */
-    .back-logo-container {
-      text-align: center;
-      margin-top: 10px;
-      margin-bottom: 2px;
-    }
-    .back-im-logo {
-      display: inline-flex;
-      align-items: flex-end;
-    }
-    .back-im-logo .dot-i-stem {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-right: 3px;
-    }
-    .back-im-logo .i-dot {
-      width: 14px;
-      height: 14px;
-      background: #00a651 !important;
-      border-radius: 50%;
-      margin-bottom: 2px;
-    }
-    .back-im-logo .i-stem {
-      width: 14px;
-      height: 32px;
-      background: #00a651 !important;
-      border-radius: 1px;
-    }
-    .back-im-logo .m-text {
-      font-size: 58px;
-      font-weight: 900;
-      color: #939598 !important;
-      line-height: 0.72;
-    }
-
-    .validity-row {
-      text-align: center;
-      font-size: 7.5px;
-      font-weight: 800;
-      color: #111;
-      margin-top: 2px;
-    }
-
-    /* REAL NATURAL SIGNATURE AREA */
-    .signature-area {
-      text-align: right;
-      padding-right: 12px;
-      margin-top: -6px;
-      margin-bottom: 4px;
-    }
-    .sig-img { width: 75px; height: 26px; object-fit: contain; display: block; margin-left: auto; margin-bottom: -3px; }
-    .sig-text { font-size: 7px; font-weight: 900; color: #111; border-top: 1px solid #111; display: inline-block; padding-top: 1px; }
-  </style>
-</head>
-<body>
-
-  <!-- INPUT CONTROLS -->
-  <div class="form-container">
-    <h2>Bulk ID Card Generator</h2>
-    
-    <div class="select-card-qty">
-      <label for="cardCount">কয়টি ID কার্ড লাগবে?</label>
-      <select id="cardCount" onchange="renderForms()">
-        <option value="1">1 Person</option>
-        <option value="2">2 Persons (1 Page)</option>
-        <option value="3">3 Persons</option>
-        <option value="4">4 Persons (2 Pages)</option>
-        <option value="5">5 Persons</option>
-        <option value="6">6 Persons (3 Pages)</option>
-        <option value="7">7 Persons</option>
-        <option value="8">8 Persons (4 Pages)</option>
-        <option value="9">9 Persons</option>
-        <option value="10" selected>10 Persons (5 Pages)</option>
-      </select>
-    </div>
-
-    <div id="formsWrapper"></div>
-
-    <button class="btn-download" onclick="downloadAllPDF()">Download All Cards (PDF)</button>
-  </div>
-
-  <!-- PDF AREA -->
-  <div class="preview-container" id="pdfArea">
-    <!-- Dynamic Content Rendered Here -->
-  </div>
-
-  <script>
-    function renderForms() {
-      const count = parseInt(document.getElementById('cardCount').value);
-      const formsWrapper = document.getElementById('formsWrapper');
-      const pdfArea = document.getElementById('pdfArea');
-
-      formsWrapper.innerHTML = '';
-      pdfArea.innerHTML = '';
-
-      let pageDiv = null;
-
-      for (let i = 1; i <= count; i++) {
-        // Form Inputs
-        formsWrapper.innerHTML += `
-          <div class="member-block">
-            <h3>Card #${i} Information</h3>
-            <div class="input-group">
-              <label>Full Name</label>
-              <input type="text" id="name_${i}" value="MD TAMIM" oninput="updateCards()">
-            </div>
-            <div class="input-group">
-              <label>ID No.</label>
-              <input type="text" id="id_${i}" value="${5160 + i - 1}" oninput="updateCards()">
-            </div>
-            <div class="input-group">
-              <label>Mobile</label>
-              <input type="text" id="mobile_${i}" value="01608-038005" oninput="updateCards()">
-            </div>
-            <div class="input-group">
-              <label>Blood Group</label>
-              <input type="text" id="blood_${i}" value="O+" oninput="updateCards()">
-            </div>
-            <div class="input-group">
-              <label>Profile Photo</label>
-              <input type="file" accept="image/*" onchange="loadPhoto(event, ${i})">
-            </div>
-          </div>
-        `;
-
-        // Create a new A4 Page every 2 cards
-        if ((i - 1) % 2 === 0) {
-          pageDiv = document.createElement('div');
-          pageDiv.className = 'pdf-page';
-          pdfArea.appendChild(pageDiv);
-        }
-
-        // Render ID Cards
-        const pairHTML = `
-          <div class="card-pair-wrapper">
-            <!-- FRONT SIDE -->
-            <div class="id-card">
-              <div>
-                <div class="front-header">
-                  <div class="brand-im-logo">
-                    <div class="dot-i-stem">
-                      <div class="i-dot"></div>
-                      <div class="i-stem"></div>
-                    </div>
-                    <div class="m-text">m</div>
-                  </div>
-                  <div class="company-title">
-                    <span class="light-green">Insight</span> <span class="white-txt">Metrics Limited</span>
-                  </div>
-                  <div class="pill-badge">IDENTITY CARD</div>
-                </div>
-
-                <div class="photo-container">
-                  <img id="photo_preview_${i}" src="https://via.placeholder.com/105x115?text=Photo" alt="User Photo">
-                </div>
-
-                <div class="name-wrapper">
-                  <div class="user-name" id="view_name_${i}">MD TAMIM</div>
-                </div>
-
-                <div class="info-section">
-                  <div class="info-row"><span class="info-label">ID NO.</span><span class="info-val" id="view_id_${i}">:${5160 + i - 1}</span></div>
-                  <div class="info-row"><span class="info-label">MOBILE</span><span class="info-val" id="view_mobile_${i}">: 01608-038005</span></div>
-                  <div class="info-row"><span class="info-label">BLOOD GROUP</span><span class="info-val" id="view_blood_${i}">: O+</span></div>
-                </div>
-              </div>
-              <div class="bottom-bar"></div>
-            </div>
-
-            <!-- BACK SIDE -->
-            <div class="id-card">
-              <div>
-                <div class="back-header">
-                  <div class="company-title">
-                    <span class="light-green">Insight</span> <span class="white-txt">Metrics Limited</span>
-                  </div>
-                </div>
-
-                <div class="office-location-title">OFFICE LOCATION</div>
-                <div class="address-card">
-                  House #10, Suite #203, Level #1, Road #8<br>
-                  Gulshan #1, Dhaka 1212, Bangladesh<br>
-                  <b>Call:</b> 01311930805 |<br>
-                  www.insightmetricsbd.com
-                </div>
-
-                <div class="client-title">ASSOCIATED CLIENT COMPANIES</div>
-                <div class="client-logos">
-                  <span class="gp">grameenphone</span>
-                  <span class="jti">JTi</span>
-                  <div class="akg-emblem">AKG</div>
-                  <span class="smc">SMC</span>
-                </div>
-
-                <div class="back-logo-container">
-                  <div class="back-im-logo">
-                    <div class="dot-i-stem">
-                      <div class="i-dot"></div>
-                      <div class="i-stem"></div>
-                    </div>
-                    <div class="m-text">m</div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div class="validity-row">
-                  Issue Date: 01-02-2024 | Expire Date: 12-31-2028
-                </div>
-
-                <div class="signature-area">
-                  <svg class="sig-img" viewBox="0 0 140 50">
-                    <path d="M 10 38 Q 32 15 50 6 C 52 25 55 35 58 42 C 60 40 68 28 72 26 C 75 32 76 38 78 35 C 85 24 92 28 95 32 C 102 26 110 28 118 26" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <div class="sig-text">Issuing Authority</div>
-                </div>
-                <div class="bottom-bar"></div>
-              </div>
-            </div>
-          </div>
-        `;
-
-        pageDiv.innerHTML += pairHTML;
-      }
-    }
-
-    function updateCards() {
-      const count = parseInt(document.getElementById('cardCount').value);
-      for (let i = 1; i <= count; i++) {
-        document.getElementById(`view_name_${i}`).innerText = document.getElementById(`name_${i}`).value;
-        document.getElementById(`view_id_${i}`).innerText = ":" + document.getElementById(`id_${i}`).value;
-        document.getElementById(`view_mobile_${i}`).innerText = ": " + document.getElementById(`mobile_${i}`).value;
-        document.getElementById(`view_blood_${i}`).innerText = ": " + document.getElementById(`blood_${i}`).value;
-      }
-    }
-
-    function loadPhoto(event, idIndex) {
-      const reader = new FileReader();
-      reader.onload = function() {
-        document.getElementById(`photo_preview_${idIndex}`).src = reader.result;
-      }
-      if(event.target.files[0]){
-        reader.readAsDataURL(event.target.files[0]);
-      }
-    }
-
-    function downloadAllPDF() {
-      const element = document.getElementById('pdfArea');
-      const opt = {
-        margin:       0,
-        filename:     'Insight_Metrics_Unique_ID_Cards.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-      };
-
-      html2pdf().set(opt).from(element).save();
-    }
-
-    window.onload = renderForms;
-  </script>
-</body>
-</html>
+# ফ্লোর অনুযায়ী দোকানের সংখ্যা গণনা
+summary = df.groupby('Floor').size().reset_index(name='Total_Shops')
+print("--- Floor Summary ---")
+print(summary)
