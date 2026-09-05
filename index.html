@@ -1,104 +1,273 @@
-import pandas as pd
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সাভার নিউ মার্কেট শপ ডিরেক্টরি</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .floor-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .floor-btn:hover {
+            background-color: #0056b3;
+        }
+        .shop-list {
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .shop-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+        .shop-item:hover {
+            background-color: #eef2f7;
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #888;
+        }
+        .close-btn:hover {
+            color: black;
+        }
+        .detail-item {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+        .detail-item strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
 
-# PDF থেকে সংগৃহীত ডেটাসেট
-data = [
-    # Underground / Basement Floor
-    {"Floor": "Underground/Basement", "Name": "Sajid Export Zone", "Wallet": "1714406608", "Address": "under ground, shop no-3c"},
-    {"Floor": "Underground/Basement", "Name": "T.S.S COLLECTION", "Wallet": "1739677329", "Address": "Shop no 45,46 Basement 1"},
-    {"Floor": "Underground/Basement", "Name": "MS Fashion", "Wallet": "1911164958", "Address": "Shop number 68, basement floor"},
-    {"Floor": "Underground/Basement", "Name": "Afifa Cuting To Fiting", "Wallet": "1967148963", "Address": "H-94, Ander Ground"},
-    {"Floor": "Underground/Basement", "Name": "Export Zone-2", "Wallet": "1327265551", "Address": "besment floor, Shop number 96"},
-    {"Floor": "Underground/Basement", "Name": "MA FASHION", "Wallet": "1312612351", "Address": "Shop No 17, Basement-1"},
-    {"Floor": "Underground/Basement", "Name": "Maima Enterprise", "Wallet": "1828242712", "Address": "Shop no 109, Basement 1"},
-    {"Floor": "Underground/Basement", "Name": "Stand Blue", "Wallet": "1720610351", "Address": "Shop-129, Underground"},
-    {"Floor": "Underground/Basement", "Name": "APPARELS 365", "Wallet": "1712124127", "Address": "besment Floor, Shop Number 92"},
-    {"Floor": "Underground/Basement", "Name": "OUTFITS ZONE", "Wallet": "1631686015", "Address": "ground floor shop 03 e basement"},
-    {"Floor": "Underground/Basement", "Name": "TOP APPAREL", "Wallet": "1620593033", "Address": "UNDER GROUND FLOOR, DOKAN NO-13"},
-    {"Floor": "Underground/Basement", "Name": "Global Connect Tour and Travels", "Wallet": "1630888003", "Address": "Underground Shop No 6"},
-    {"Floor": "Underground/Basement", "Name": "SHAHEEN Export ware", "Wallet": "1764066488", "Address": "Shop Number 67, Basement floor"},
+<div class="container">
+    <h1>সাভার নিউ মার্কেট শপ লিস্ট</h1>
+    <div id="buttons" style="text-align: center;"></div>
+    
+    <div class="shop-list" id="shopList">
+        <p style="text-align: center; color: #666;">একটি ফ্লোর সিলেক্ট করুন দোকানে ক্লিক করে বিস্তারিত দেখতে।</p>
+    </div>
+</div>
 
-    # Ground Floor / Nich Tola
-    {"Floor": "Ground Floor", "Name": "Shopno Purno Cosmetics", "Wallet": "1722072963", "Address": "03, S-28, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "Gifts Zone", "Wallet": "1853275440", "Address": "Shop no 135 A, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "Innovative Computer And Technologies", "Wallet": "1867806010", "Address": "Shop-49, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "Rosni Porda Gallery And Boutiques", "Wallet": "1701623531", "Address": "129, 132, 133, Nich Tola"},
-    {"Floor": "Ground Floor", "Name": "Yash Fashion", "Wallet": "1607632387", "Address": "shop number 63, ground floor"},
-    {"Floor": "Ground Floor", "Name": "FALAK COSMETICS", "Wallet": "1794538584", "Address": "Shop No 25"},
-    {"Floor": "Ground Floor", "Name": "FRENZY LEATHER & SPORTS", "Wallet": "1891147614", "Address": "Ground floor, Shop 146,147"},
-    {"Floor": "Ground Floor", "Name": "LIANA BEAUTY SPOT", "Wallet": "1773551589", "Address": "shop-139, ground floor"},
-    {"Floor": "Ground Floor", "Name": "MIM EXPORT HOUSE", "Wallet": "1720601752", "Address": "shop no -84/A, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "Micronet Computers", "Wallet": "1727162026", "Address": "Ground floor, Shop number 71"},
-    {"Floor": "Ground Floor", "Name": "PRINTER SERVICE SYSTEM", "Wallet": "1973341127", "Address": "Shop No-84/C, Ground floor"},
-    {"Floor": "Ground Floor", "Name": "Pixel Computer & Network", "Wallet": "1772686808", "Address": "Ground floor, Shop Number 69"},
-    {"Floor": "Ground Floor", "Name": "Time Point", "Wallet": "1968751403", "Address": "Graund floor DOKAN No-156"},
-    {"Floor": "Ground Floor", "Name": "ASIAN IT", "Wallet": "1719526069", "Address": "Shop-31 ground floor"},
-    {"Floor": "Ground Floor", "Name": "FRENZY", "Wallet": "1970943756", "Address": "Group floor, Shop number 146-147"},
-    {"Floor": "Ground Floor", "Name": "TECH FLOW", "Wallet": "1729954359", "Address": "shop-84/F, Grand floor"},
-    {"Floor": "Ground Floor", "Name": "BHUIYAN LEATHER", "Wallet": "1673370508", "Address": "shop no 148, ground floor"},
-    {"Floor": "Ground Floor", "Name": "Shopno Purno", "Wallet": "1810508861", "Address": "Shop no-28, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "SPORTS ZONE", "Wallet": "1992282743", "Address": "ground floor shop 146/147"},
-    {"Floor": "Ground Floor", "Name": "Opsora I T", "Wallet": "1717066899", "Address": "New Market Nistala"},
-    {"Floor": "Ground Floor", "Name": "Silver Fashion", "Wallet": "1631435670", "Address": "SHOP-38, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "Ango Shaj", "Wallet": "1810899563", "Address": "Ground floor, Shop number 59"},
-    {"Floor": "Ground Floor", "Name": "AYAN WATCH", "Wallet": "1850008051", "Address": "Shop No-125, Ground floor"},
-    {"Floor": "Ground Floor", "Name": "Rafia Fashion Maker", "Wallet": "1922237726", "Address": "58, Ground Floor"},
-    {"Floor": "Ground Floor", "Name": "Innoverse Technology", "Wallet": "1773195085", "Address": "ground floor, Shop Number 70"},
-    {"Floor": "Ground Floor", "Name": "RAIYAN COSMETICS", "Wallet": "1723868780", "Address": "Shop No 24, Grund Floor"},
-    {"Floor": "Ground Floor", "Name": "TOYLAND", "Wallet": "1772096626", "Address": "NEW MARKET, GROUND FLOOR SHOP NO 135/A"},
-    {"Floor": "Ground Floor", "Name": "Frendes Fastfood", "Wallet": "1888013240", "Address": "Nichtola Savar Newmarket"},
-    {"Floor": "Ground Floor", "Name": "Watch World", "Wallet": "1985120169", "Address": "S-23, Nich Tala"},
+<!-- Modal for Shop Details -->
+<div class="modal" id="shopModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalShopName" style="margin-top:0; color:#007bff;"></h3>
+        <div class="detail-item"><strong>SL Number:</strong> <span id="modalSL"></span></div>
+        <div class="detail-item"><strong>Floor:</strong> <span id="modalFloor"></span></div>
+        <div class="detail-item"><strong>Merchant / Wallet:</strong> <span id="modalWallet"></span></div>
+        <div class="detail-item"><strong>Address:</strong> <span id="modalAddress"></span></div>
+        <div class="detail-item"><strong>Category:</strong> <span id="modalCategory"></span></div>
+    </div>
+</div>
 
-    # 1st Floor
-    {"Floor": "1st Floor", "Name": "Mehedi Shoes", "Wallet": "1787936554", "Address": "Dokan-224, 1St Floor"},
-    {"Floor": "1st Floor", "Name": "Top Baby Shop", "Wallet": "1906838800", "Address": "54, Ist Floor"},
-    {"Floor": "1st Floor", "Name": "Payel Fashion", "Wallet": "1798759220", "Address": "Shop-70/71, 1st floor"},
-    {"Floor": "1st Floor", "Name": "Haque Borka Bazar", "Wallet": "1978264014", "Address": "lift er 1st floor, Shop number 197"},
-    {"Floor": "1st Floor", "Name": "Irani Borka Bazar", "Wallet": "1620144477", "Address": "Shop-204/a, 1st floor"},
-    {"Floor": "1st Floor", "Name": "Moon Tailors", "Wallet": "1818470558", "Address": "First Floor Newmarket"},
+<script>
+const shops = [
+    // Underground / Basement
+    {sl: "273572", floor: "Underground/Basement", name: "Sajid Export Zone", wallet: "1714406608", address: "S-46, 47, 48, Savar New Market, Savar, Dhaka", category: "Super Active"},
+    {sl: "277804", floor: "Underground/Basement", name: "T.S.S COLLECTION", wallet: "1739677329", address: "Shop no 45,46 Basement 1, Savar New Market, Savar, Dhaka", category: "Moderate"},
+    {sl: "285565", floor: "Underground/Basement", name: "MS Fashion", wallet: "1911164958", address: "Shop number 68, basement floor, Savar new market, Savar, Dhaka", category: "New"},
+    {sl: "387125", floor: "Underground/Basement", name: "Afifa Cuting To Fiting", wallet: "1967148963", address: "H-94, Ander Ground, Savar New Market, Savar Prouroshova, Savar, Dhaka", category: "New"},
+    {sl: "387451", floor: "Underground/Basement", name: "Export Zone-2", wallet: "1327265551", address: "Savar New market besment floor, Shop number 96, Savar, Dhaka", category: "New"},
+    {sl: "387751", floor: "Underground/Basement", name: "MA FASHION", wallet: "1312612351", address: "Shop No 17, Basement-1, Savar New Market, Savar Bus Stand, Savar, Dhaka", category: "Super Active"},
+    {sl: "396701", floor: "Underground/Basement", name: "Maima Enterprise", wallet: "1828242712", address: "Shop no 109, Basement 1, Savar New Market, Savar, Dhaka", category: "New"},
+    {sl: "422355", floor: "Underground/Basement", name: "Stand Blue", wallet: "1720610351", address: "Shop-129, Underground, Savar New Market, Savar Pourosova, Savar, Dhaka", category: "New"},
+    {sl: "431269", floor: "Underground/Basement", name: "APPARELS 365", wallet: "1712124127", address: "Savar New Market Er besment Floor, Shop Number 92, Savar, Dhaka", category: "New"},
+    {sl: "480958", floor: "Underground/Basement", name: "OUTFITS ZONE", wallet: "1631686015", address: "Savar new market ground floor shop 03 e basement, Savar - 1340, Savar, Dhaka", category: "Moderate"},
+    {sl: "278993", floor: "Underground/Basement", name: "TOP APPAREL", wallet: "1620593033", address: "NEW MARKET UNDER GROUND FLOOR SREE THAKE SAMNE DOKAN NO-13, SAVAR DHAKA", category: "Occasional"},
+    {sl: "288516", floor: "Underground/Basement", name: "Global Connect Tour and Travels", wallet: "1630888003", address: "New Market Underground Shop No 6 Savar Dhaka", category: "New"},
+    {sl: "395395", floor: "Underground/Basement", name: "SHAHEEN Export ware", wallet: "1764066488", address: "Shop Number 67, New market Basement floor, Savar, Dhaka", category: "Super Active"},
 
-    # 2nd Floor
-    {"Floor": "2nd Floor", "Name": "Ayush Panjabi", "Wallet": "1728492372", "Address": "2nd floor, Shop Number 58"},
-    {"Floor": "2nd Floor", "Name": "AL ARAF ORNA HOUSE", "Wallet": "1710345436", "Address": "Shop No, 159, 160, 161, 2rd Floor"},
-    {"Floor": "2nd Floor", "Name": "Sajal Jewellers", "Wallet": "1789334155", "Address": "2nd floor, Shop number 257"},
-    {"Floor": "2nd Floor", "Name": "Al-Samir Exclusive Point", "Wallet": "1575615970", "Address": "2nd floor, Shop Number 69"},
-    {"Floor": "2nd Floor", "Name": "Orni shoes", "Wallet": "1938379145", "Address": "shop no-221, 2 nd floor"},
-    {"Floor": "2nd Floor", "Name": "OUTFIT", "Wallet": "1961362321", "Address": "Lift er 2nd, Shop number 19"},
-    {"Floor": "2nd Floor", "Name": "SARTHOK JEWELLERS", "Wallet": "1344474837", "Address": "2nd floor, Shop no-241"},
-    {"Floor": "2nd Floor", "Name": "Meli Maching Center", "Wallet": "1727779644", "Address": "178, 2Nd Floor"},
-    {"Floor": "2nd Floor", "Name": "Mita Style", "Wallet": "1822206311", "Address": "Shop-66, 2Nd Floor"},
-    {"Floor": "2nd Floor", "Name": "Anan Emitation Jewelers", "Wallet": "1670830829", "Address": "A-261 No Dokan 2Nd Floor"},
-    {"Floor": "2nd Floor", "Name": "Rafeja Tops Gallery", "Wallet": "1640726259", "Address": "2nd floor, Shop Number 152, 153"},
-    {"Floor": "2nd Floor", "Name": "New Jononi Fashion Tailors", "Wallet": "1576681800", "Address": "2nd floor, Shop Number 116"},
-    {"Floor": "2nd Floor", "Name": "ABORON PANJABI", "Wallet": "1944712935", "Address": "Shop no-112, 2nd Floor"},
-    {"Floor": "2nd Floor", "Name": "Exclusive One Jewellers", "Wallet": "1930336612", "Address": "2nd floor, Shop number 255"},
-    {"Floor": "2nd Floor", "Name": "PHONEBOOK", "Wallet": "1607043232", "Address": "2nd floor shop no 21"},
-    {"Floor": "2nd Floor", "Name": "SULTAN PANJABI-SAVAR-2", "Wallet": "1631317063", "Address": "SHOP NO-53/54, 2ND FLOOR"},
-    {"Floor": "2nd Floor", "Name": "BISHAL JEWELLERS", "Wallet": "1410008451", "Address": "Shop No. 242, 243, 2nd Floor"},
-    {"Floor": "2nd Floor", "Name": "Arabiyan Borka Gallery", "Wallet": "1950335177", "Address": "2nd floor, Shop Number 196"},
-    {"Floor": "2nd Floor", "Name": "Khokon Fashion", "Wallet": "1939576130", "Address": "Shop No-101, 2nd Floor"},
+    // Ground Floor
+    {sl: "274744", floor: "Ground Floor", name: "Shopno Purno Cosmetics", wallet: "1722072963", address: "03, S-28, Savar New Market, Ground Floor, Savar, Savar Pouroshova, Savar, Dhaka", category: "Super Active"},
+    {sl: "275375", floor: "Ground Floor", name: "Gifts Zone", wallet: "1853275440", address: "Shop no 135 A, Savar New Market, Ground Floor, Savar, Dhaka", category: "Irregular"},
+    {sl: "276661", floor: "Ground Floor", name: "Innovative Computer And Technologies", wallet: "1867806010", address: "Shop-49, Savar New Market Ground Floor, Savar Pourosova, Savar, Dhaka", category: "Irregular"},
+    {sl: "279661", floor: "Ground Floor", name: "Rosni Porda Gallery And Boutiques", wallet: "1701623531", address: "129, 132, 133, Savar New Market Nich Tola, Savar Pourosova, Savar, Dhaka", category: "New"},
+    {sl: "288026", floor: "Ground Floor", name: "Yash Fashion", wallet: "1607632387", address: "shop number 63, Savar new market ground floor, Savar, Dhaka", category: "New"},
+    {sl: "296635", floor: "Ground Floor", name: "FALAK COSMETICS", wallet: "1794538584", address: "Shop No 25, Savar New Market, Savar, Dhaka", category: "Irregular"},
+    {sl: "303493", floor: "Ground Floor", name: "FRENZY LEATHER & SPORTS", wallet: "1891147614", address: "Savar New marke Ground floor, Shop Number 146,147", category: "New"},
+    {sl: "313285", floor: "Ground Floor", name: "LIANA BEAUTY SPOT", wallet: "1773551589", address: "shop-139, ground floor, savar new market, savar, dhaka", category: "Moderate"},
+    {sl: "314600", floor: "Ground Floor", name: "MIM EXPORT HOUSE", wallet: "1720601752", address: "shop no -84/A, Savar New Market Ground Floor, Savar, Dhaka", category: "New"},
+    {sl: "389650", floor: "Ground Floor", name: "Micronet Computers", wallet: "1727162026", address: "Savar New market Ground floor, Shop number 71, Savar, Dhaka", category: "New"},
+    {sl: "391049", floor: "Ground Floor", name: "PRINTER SERVICE SYSTEM", wallet: "1973341127", address: "Shop No-84/C, Ground floor, Savar New Market, Savar, Dhaka", category: "Irregular"},
+    {sl: "417886", floor: "Ground Floor", name: "Pixel Computer & Network", wallet: "1772686808", address: "Savar New market Ground floor, Shop Number 69, Savar, Dhaka", category: "New"},
+    {sl: "423962", floor: "Ground Floor", name: "Time Point", wallet: "1968751403", address: "Savar New Market Graund floor DOKAN No-156 Sopno pase, Savar DHAKA", category: "New"},
+    {sl: "445244", floor: "Ground Floor", name: "ASIAN IT", wallet: "1719526069", address: "Shop-31 ground floor Savar New market Savar Dhaka", category: "Moderate"},
+    {sl: "461298", floor: "Ground Floor", name: "FRENZY", wallet: "1970943756", address: "Savar New market, Group floor, Shop number 146-147, Savar Bus stand", category: "New"},
+    {sl: "462079", floor: "Ground Floor", name: "TECH FLOW", wallet: "1729954359", address: "shop-84/F, Grand floor, Savar new market", category: "New"},
+    {sl: "476590", floor: "Ground Floor", name: "BHUIYAN LEATHER", wallet: "1673370508", address: "shop no 148, savar new market ground floor shop 148", category: "Irregular"},
+    {sl: "479213", floor: "Ground Floor", name: "Shopno Purno", wallet: "1810508861", address: "Savar New Market, Shop no-28, Ground Floor, Savar dhaka", category: "Moderate"},
+    {sl: "483081", floor: "Ground Floor", name: "SPORTS ZONE", wallet: "1410008451", address: "savar new market, ground floor shop 146/147, savar dhaka", category: "Super Active"},
+    {sl: "250572", floor: "Ground Floor", name: "Opsora I T", wallet: "1717066899", address: "New Market Nistala, Savar Pourashova, Savar, Dhaka", category: "New"},
+    {sl: "393130", floor: "Ground Floor", name: "Silver Fashion", wallet: "1631435670", address: "SHOP-38, Ground Floor, Savar, New Market, Savar, Dhaka", category: "New"},
+    {sl: "395869", floor: "Ground Floor", name: "Ango Shaj", wallet: "1810899563", address: "New market Ground floor, Shop number 59, Savar, Dhaka", category: "New"},
+    {sl: "397285", floor: "Ground Floor", name: "AYAN WATCH", wallet: "1850008051", address: "Shop No-125, Ground floor New market, Savar, Dhaka", category: "Moderate"},
+    {sl: "397461", floor: "Ground Floor", name: "Rafia Fashion Maker", wallet: "1922237726", address: "58, Ground Floor Savara New Market, Savar, Savar, Dhaka", category: "New"},
+    {sl: "399848", floor: "Ground Floor", name: "Innoverse Technology", wallet: "1773195085", address: "New market ground floor, Shop Number 70, Savar, Dhaka", category: "New"},
+    {sl: "457925", floor: "Ground Floor", name: "RAIYAN COSMETICS", wallet: "1723868780", address: "Shop No 24, Grund Floor, Savar, New Market, Savar, Dhaka", category: "Occasional"},
+    {sl: "474721", floor: "Ground Floor", name: "TOYLAND", wallet: "1772096626", address: "Shop no 135/A, NEW MARKET, GROUND FLOOR SHOP NO 135/A", category: "Occasional"},
+    {sl: "269142", floor: "Ground Floor", name: "Frendes Fastfood", wallet: "1888013240", address: "Nichtola Savar Newmarket, Savar, Savar, Dhaka", category: "New"},
+    {sl: "417084", floor: "Ground Floor", name: "Watch World", wallet: "1985120169", address: "S-23, Nich Tala, Savar Newmarket, Savar Powrasava", category: "Moderate"},
 
-    # 3rd Floor
-    {"Floor": "3rd Floor", "Name": "Sotota Food Garden", "Wallet": "1603480936", "Address": "3rd floor, Shop Number F3"},
-    {"Floor": "3rd Floor", "Name": "Time pass 2", "Wallet": "1331471000", "Address": "food court, 3rd floor"},
-    {"Floor": "3rd Floor", "Name": "Time Pass", "Wallet": "1992891841", "Address": "lift er 3rd floor, Food court er ekane"},
-    {"Floor": "3rd Floor", "Name": "Fast Food Corner", "Wallet": "1648497663", "Address": "3rd floor, Food Court er vitore"},
-    {"Floor": "3rd Floor", "Name": "yummy tasty eh", "Wallet": "1326372682", "Address": "lift er 3rd floor, Food cort er vitorei"},
-    {"Floor": "3rd Floor", "Name": "Saian Telecom", "Wallet": "1799899493", "Address": "Shop No-124, 3rd floor"},
-    {"Floor": "3rd Floor", "Name": "Maestro Collection", "Wallet": "1723062362", "Address": "Level. 3, Shop no.A-1"},
-    {"Floor": "3rd Floor", "Name": "A R Telecom", "Wallet": "1614988899", "Address": "S-161-162, 3Rd Floor"},
-    {"Floor": "3rd Floor", "Name": "Jahan Electronics", "Wallet": "1787164822", "Address": "184, 3Rd Floor"},
-    {"Floor": "3rd Floor", "Name": "JAYAN TELECOM", "Wallet": "1903512169", "Address": "Shop number 116, 3rd floor"},
-    {"Floor": "3rd Floor", "Name": "SHAMPAN MOBILE ZONE", "Wallet": "1601899248", "Address": "shop no- 129/A, 3rd floor"},
-    {"Floor": "3rd Floor", "Name": "Dream Gadget 360", "Wallet": "1920202362", "Address": "Shop No 115, 3rd Floor"},
+    // 1st Floor
+    {sl: "264618", floor: "1st Floor", name: "Mehedi Shoes", wallet: "1787936554", address: "Dokan-224, Savar New Market, 1St Floor, Savar, Dhaka", category: "New"},
+    {sl: "265349", floor: "1st Floor", name: "Top Baby Shop", wallet: "1906838800", address: "54, Savar New Market, Ist Floor, Savar Pouroshova, Savar, Dhaka", category: "New"},
+    {sl: "285500", floor: "1st Floor", name: "Payel Fashion", wallet: "1798759220", address: "Shop-70/71, 1st floor, Savar New Market, Savar, Dhaka", category: "New"},
+    {sl: "440432", floor: "1st Floor", name: "Haque Borka Bazar", wallet: "1978264014", address: "Savar new market lift er 1st floor, Shop number 197, Savar Bus stand", category: "New"},
+    {sl: "444299", floor: "1st Floor", name: "Irani Borka Bazar", wallet: "1620144477", address: "Shop-204/a Savar New Market, 1st floor, Savar, Dhaka", category: "New"},
+    {sl: "266046", floor: "1st Floor", name: "Moon Tailors", wallet: "1818470558", address: "First Floor Newmarket Savar Dhaka", category: "Occasional"},
 
-    # 4th Floor
-    {"Floor": "4th Floor", "Name": "ROYAL EMBAER", "Wallet": "1818613771", "Address": "SHOP NO-18, 4TH FLOOR"}
-]
+    // 2nd Floor
+    {sl: "251547", floor: "2nd Floor", name: "Ayush Panjabi", wallet: "1728492372", address: "Savar New market 2nd floor, Shop Number 58, Savar, Dhaka", category: "New"},
+    {sl: "253303", floor: "2nd Floor", name: "AL ARAF ORNA HOUSE", wallet: "1710345436", address: "Shop No, 159, 160, 161, 2rd Floor, Savar New Market, Savar, Dhaka", category: "New"},
+    {sl: "266510", floor: "2nd Floor", name: "Sajal Jewellers", wallet: "1789334155", address: "Savar new market 2nd floor, Shop number 257, Savar, Dhaka", category: "Occasional"},
+    {sl: "267689", floor: "2nd Floor", name: "Al-Samir Exclusive Point", wallet: "1575615970", address: "Savar new market 2nd floor, Shop Number 69, Savar, Dhaka", category: "New"},
+    {sl: "281987", floor: "2nd Floor", name: "Orni shoes", wallet: "1938379145", address: "Orni shoes shop no-221 savar new market 2 nd floor savar dhaka", category: "New"},
+    {sl: "288496", floor: "2nd Floor", name: "OUTFIT", wallet: "1961362321", address: "Savar new market, Lift er 2nd, Shop number 19, Savar bus stand, Dhaka", category: "New"},
+    {sl: "314251", floor: "2nd Floor", name: "SARTHOK JEWELLERS", wallet: "1344474837", address: "Savar New market 2nd floor, Shop no-241 Savar Bus Stand, Savar Dhaka", category: "New"},
+    {sl: "393807", floor: "2nd Floor", name: "Meli Maching Center", wallet: "1727779644", address: "178, Savar New Market 2Nd Floor, Savar, Dhaka", category: "Occasional"},
+    {sl: "397787", floor: "2nd Floor", name: "Mita Style", wallet: "1822206311", address: "Shop-66, Savar New Market 2Nd Floor, Savar, Dhaka", category: "New"},
+    {sl: "409406", floor: "2nd Floor", name: "Anan Emitation Jewelers", wallet: "1670830829", address: "A-261 No Dokan 2Nd Floor, Savar New Market, Savar Pauroshova, Savar", category: "Moderate"},
+    {sl: "426628", floor: "2nd Floor", name: "Rafeja Tops Gallery", wallet: "1640726259", address: "Savar New Market 2nd floor, Shop Number 152, 153, Savar, Dhkaa", category: "Moderate"},
+    {sl: "426812", floor: "2nd Floor", name: "New Jononi Fashion Tailors", wallet: "1576681800", address: "Savar New market 2nd floor, Shop Number 116, Savar, Dhaka", category: "Moderate"},
+    {sl: "440524", floor: "2nd Floor", name: "ABORON PANJABI", wallet: "1944712935", address: "Shop no-112, Savar New Market 2nd Floor, Savar, Dhaka", category: "Moderate"},
+    {sl: "440594", floor: "2nd Floor", name: "Exclusive One Jewellers", wallet: "1930336612", address: "Savar New market 2nd floor, Shop number 255, Savar, Dhaka", category: "New"},
+    {sl: "475741", floor: "2nd Floor", name: "PHONEBOOK", wallet: "1607043232", address: "savar new 2nd floor shop no 21 savar Dhaka", category: "Super Active"},
+    {sl: "480007", floor: "2nd Floor", name: "SULTAN PANJABI-SAVAR-2", wallet: "1631317063", address: "SHOP NO-53/54, SAVAR NEW MARKET 2ND FLOOR, SAVAR, DHAKA", category: "Moderate"},
+    {sl: "480516", floor: "2nd Floor", name: "BISHAL JEWELLERS", wallet: "1631686015", address: "Shop No. 242, 243, Savar New Market 2nd Floor, Savar, Dhaka", category: "Moderate"},
+    {sl: "258127", floor: "2nd Floor", name: "Arabiyan Borka Gallery", wallet: "1950335177", address: "New market 2nd floor, Shop Number 196, Savar, Dhaka", category: "Occasional"},
+    {sl: "285419", floor: "2nd Floor", name: "Khokon Fashion", wallet: "1939576130", address: "Shop No-101, New Market, 2nd Floor, Bus Stand, Savar, Dhaka", category: "New"},
 
-# DataFrame তৈরি
-df = pd.DataFrame(data)
+    // 3rd Floor
+    {sl: "258188", floor: "3rd Floor", name: "Sotota Food Garden", wallet: "1603480936", address: "Savar New Market 3rd floor, Shop Number F3, Savar, Dhaka", category: "New"},
+    {sl: "258287", floor: "3rd Floor", name: "Time pass 2", wallet: "1331471000", address: "Savar new Market food court, 3rd floor, savar new market, savar, Dhaka", category: "New"},
+    {sl: "264082", floor: "3rd Floor", name: "Time Pass", wallet: "1992891841", address: "Savar new market lift er 3rd floor, Food court er ekane, savar, Dhaka", category: "New"},
+    {sl: "274415", floor: "3rd Floor", name: "Fast Food Corner", wallet: "1648497663", address: "Savar New Market 3rd floor, Food Court er vitore, Savar, Dhaka", category: "New"},
+    {sl: "275059", floor: "3rd Floor", name: "yummy tasty eh", wallet: "1326372682", address: "Savar New market lift er 3rd floor, Food cort er vitorei, Dilli Dorbar er Opposite side", category: "Super Active"},
+    {sl: "278568", floor: "3rd Floor", name: "Saian Telecom", wallet: "1799899493", address: "Shop No-124, 3rd floor, Savar New Market, Bus Stand, Savar, Dhaka", category: "New"},
+    {sl: "410083", floor: "3rd Floor", name: "Maestro Collection", wallet: "1723062362", address: "Level. 3, Shop no.A-1, Savar New Market, Savar, Dhaka", category: "New"},
+    {sl: "418921", floor: "3rd Floor", name: "A R Telecom", wallet: "1614988899", address: "S-161-162, Savar New Market, 3Rd Floor, Savar Pourosova, Savar, Dhaka", category: "New"},
+    {sl: "426720", floor: "3rd Floor", name: "Jahan Electronics", wallet: "1787164822", address: "184 Savar New Market 3Rd Floor, Savar Pourashova, Savar, Dhaka", category: "New"},
+    {sl: "461287", floor: "3rd Floor", name: "JAYAN TELECOM", wallet: "1903512169", address: "Shop number 116,3rd floor, Savar new market, savar - 1340, savar", category: "New"},
+    {sl: "476419", floor: "3rd Floor", name: "SHAMPAN MOBILE ZONE", wallet: "1601899248", address: "shop no- 129/A, new market 3rd floor, Savar - 1340, Savar, Dhaka", category: "New"},
+    {sl: "478573", floor: "3rd Floor", name: "Dream Gadget 360", wallet: "1920202362", address: "Shop No 115, 3rd Floor New Market, Savar, Dhaka-1340", category: "New"},
 
-# ফ্লোর অনুযায়ী দোকানের সংখ্যা গণনা
-summary = df.groupby('Floor').size().reset_index(name='Total_Shops')
-print("--- Floor Summary ---")
-print(summary)
+    // 4th Floor
+    {sl: "485339", floor: "4th Floor", name: "ROYAL EMBAER", wallet: "1818613771", address: "SHOP NO-18, SAVAR NEW MARKET 4TH FLOOR, SAVAR, DHAKA", category: "Super Active"}
+];
+
+const floors = ["Underground/Basement", "Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"];
+
+function renderButtons() {
+    const btnContainer = document.getElementById("buttons");
+    floors.forEach(floor => {
+        const count = shops.filter(s => s.floor === floor).length;
+        const btn = document.createElement("button");
+        btn.className = "floor-btn";
+        btn.innerText = `${floor} (${count})`;
+        btn.onclick = () => showShops(floor);
+        btnContainer.appendChild(btn);
+    });
+}
+
+function showShops(floorName) {
+    const shopList = document.getElementById("shopList");
+    const filteredShops = shops.filter(s => s.floor === floorName);
+    
+    let html = `<h3>${floorName} - মোট দোকান (${filteredShops.length} টি)</h3>`;
+    filteredShops.forEach(shop => {
+        html += `
+            <div class="shop-item" onclick="openModal('${shop.sl}')">
+                <span><strong>SL: ${shop.sl}</strong> — ${shop.name}</span>
+                <span style="color:#007bff;">বিস্তারিত দেখুন &rarr;</span>
+            </div>
+        `;
+    });
+    
+    shopList.innerHTML = html;
+}
+
+function openModal(slNumber) {
+    const shop = shops.find(s => s.sl === slNumber);
+    if(shop) {
+        document.getElementById("modalShopName").innerText = shop.name;
+        document.getElementById("modalSL").innerText = shop.sl;
+        document.getElementById("modalFloor").innerText = shop.floor;
+        document.getElementById("modalWallet").innerText = shop.wallet;
+        document.getElementById("modalAddress").innerText = shop.address;
+        document.getElementById("modalCategory").innerText = shop.category;
+        
+        document.getElementById("shopModal").style.display = "flex";
+    }
+}
+
+function closeModal() {
+    document.getElementById("shopModal").style.display = "none";
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById("shopModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Initial Call
+renderButtons();
+</script>
+
+</body>
+</html>
